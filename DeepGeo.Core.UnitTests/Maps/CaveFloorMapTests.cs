@@ -11,19 +11,22 @@ using Ninject.Parameters;
 namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 {
     [TestFixture]
-    class CaveFloorMapTests : AbstractUnitTest
+    class CaveFloorMapTests
     {
         [Test]
         public void IsWalkableReturnsTrueForWalkableTiles()
         {
-            var floor = kernel.Get<CaveFloorMap>(new ConstructorArgument("width", 20), new ConstructorArgument("height", 20));
+            var floorWidth = 100;
+            var floorHeight = 50;
+
+            var floor = new CaveFloorMap(floorWidth, floorHeight);
             var foundFloor = false;
             var foundWall = false;
             
             // There must be at least one walkable tile and one non-walkable tile, based on the current generation strategy
-            for (var x = 0; x < 20; x++)
+            for (var x = 0; x < floorWidth; x++)
             {
-                for (var y = 0; y < 20; y++)
+                for (var y = 0; y < floorHeight; y++)
                 {
                     var walkable = floor.IsWalkable(x, y);
                     if (walkable)
@@ -39,6 +42,13 @@ namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 
             Assert.That(foundFloor, Is.EqualTo(true));
             Assert.That(foundWall, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void ConstructorCreatesStairsDownAwayFromPlayer()
+        {
+            // Stairs are randomly positioned. To avoid a flaky test, just check if the distance is non-zero.
+
         }
     }
 }

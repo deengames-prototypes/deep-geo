@@ -13,14 +13,8 @@ namespace DeenGames.DeepGeo.ConsoleUi
 {
     class Game
     {
-        // Methodology: never use .Resolve. Let DI wire up objects.
-        internal static readonly IKernel Kernel = new StandardKernel();
-
         public Game()
         {
-            // TODO: read class name from config
-            // TODO: wiring up core classes shouldn't be done in the UI
-            Kernel.Bind<IRandom>().To<RogueSharp.Random.DotNetRandom>();
         }
 
         public void Run()

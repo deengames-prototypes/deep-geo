@@ -23,8 +23,9 @@ namespace DeenGames.DeepGeo.Core.Maps
         public CaveFloorMap(int width, int height)
         {
             this.random = new RogueSharp.Random.DotNetRandom();
-            this.width = width;
-            this.height = height;
+            // If you specify width=20, RogueSharp's map x-index goes from 0..20 inclusive. That's not what we want.
+            this.width = width - 1;
+            this.height = height - 1;
 
             var mapCreationStrategy = new RogueSharp.MapCreation.RandomRoomsMapCreationStrategy<RogueSharp.Map>(width, height, 100, 15, 4);
             this.tileData = RogueSharp.Map.Create(mapCreationStrategy);
@@ -41,19 +42,23 @@ namespace DeenGames.DeepGeo.Core.Maps
             {
                 this.PlayerStartPosition = this.FindEmptyPosition();
                 distanceSquared = Math.Pow(Math.Min(this.width, this.height), 2);
+                tries += 1;
             }
         }
 
         public Point FindEmptyPosition()
         {
             // Position the player somewhere on a walkable square
-            int x = this.random.Next(this.width - 1);
-            int y = this.random.Next(this.height - 1);
+            int x = this.random.Next(1, this.width - 1);
+            int y = this.random.Next(1, this.height - 1);
+
+            Console.WriteLine($"TileData is {tileData.Width}x{tileData.Height} and we're looking at {x}, {y}");
 
             while (!(tileData.IsWalkable(x, y)) || (stairsDown.X == x && stairsDown.Y == y))
             {
                 x = this.random.Next(this.width);
                 y = this.random.Next(this.height);
+                Console.WriteLine($"TileData is {tileData.Width}x{tileData.Height} and we're looking at {x}, {y}");
             }
 
             return new Point(x, y);
