@@ -7,8 +7,8 @@
     <ProjectGuid>{C24BC693-7DF4-41A8-99A2-B8D67DC47986}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DeenGames.Cataclysm.Core</RootNamespace>
-    <AssemblyName>DeenGames.Cataclysm.Core</AssemblyName>
+    <RootNamespace>DeenGames.DeepGeo.Core</RootNamespace>
+    <AssemblyName>DeenGames.DeepGeo.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

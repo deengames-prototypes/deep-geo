@@ -7,8 +7,8 @@
     <ProjectGuid>{8B1F1803-EF32-4853-ADE1-23AE17EE979D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DeenGames.Cataclysm.Core.UnitTests</RootNamespace>
-    <AssemblyName>DeenGames.Cataclysm.Core.UnitTests</AssemblyName>
+    <RootNamespace>DeenGames.DeepGeo.Core.UnitTests</RootNamespace>
+    <AssemblyName>DeenGames.DeepGeo.Core.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
