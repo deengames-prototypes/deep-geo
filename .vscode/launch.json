@@ -6,9 +6,9 @@
             "type": "mono", // requires the Mono Debug extension
             // you may also need to: sudo apt-get install mono-complete
             "request": "launch",
-            "program": "${workspaceRoot}/Cataclysm/bin/Debug/Cataclysm.exe",
+            "program": "${workspaceRoot}/DeepGeo/bin/Debug/DeepGeo.exe",
             "args": [],
-            "cwd": "${workspaceRoot}/Cataclysm/bin/Debug",
+            "cwd": "${workspaceRoot}/DeepGeo/bin/Debug",
             "preLaunchTask": "",
             "runtimeExecutable": null,
             "env": {},
