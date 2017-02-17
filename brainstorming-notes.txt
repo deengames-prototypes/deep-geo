@@ -1,0 +1,33 @@
+lets recap, shall we?
+- using VS and working in C# at work is still a good thing.
+- slow-boiled project is still a good thing.
+- RL project is still a good thing. Niche, but acceptable.
+THEREFORE, only the content doesn't match. pick smoething else.
+
+* Games For Change had a recent thing on "nuclear risk":  disarmament, non-proliferation, and safety/security of existing materials. includes: ageing arsenals, actors trying to get nukes, modernization, nuclear-armed nations acting unpredictably.
+
+- THEME: radiation.  Avoid radiated areas, where you take permanent (non-reversible) damage via your Radiation Meter. Also, radiation spreads: creatures step in it and become radiated, items drop in it and become radiated ... your time is limited.
+- Perhaps it's a deep geological repository that's now under high pressure, and so the containment is breaking after hundreds of years
+- PERHAPS, we can do it as a future-past thing. Your tribe gets sick, elder suggests it's the strange metal the creatures now roam with, the olde bookz tell tales of radiation .... sci-fi works too. modern-day too.
+- you begin your quest, looking for why the creatures are running wild from the dungeon
+- As you venture deeper, you discover that this was indeed a deep geological repository. stewardship was maintained by some robotic system (powered by geothermal power), which is now overrun, and radioactive waste is seeping out.
+- green goo is fine, don't overthink it. this can be transuranic waste, contaminated shielding, or even vitrification (if done improperly, metals will form despite the glass).
+- uranium and plutonium bits also work. rods, little metal scraps, etc. 
+- also, the calcification thing: dark glass that's in steel drums.
+
+* challenge: no fighting. Dodge. Run out of creatures' line of sight. Sprint to out-run them (you get tired). Get to the bottom and reseal the contamination.
+* you also probably need to fix the geo thing, like repower the system and fix/replace any broken parts first. there should be backups.
+* an improperly stored barrel filled with organic cat litter (instead of clay cat litter) exploded. Some local beasts got contaminated, sick, then started rampaging as they're dying and their brain function is impaired.
+* starts out as a jungle, then devolves into an earthen dungeon, then into a high-tech facility with containment
+* You CAN'T fight. What you CAN do:
+    - hit enemies to stun them temporarily (usually works). fast and cheap.
+    - push. pushing enemies koncks them back a few feet. costly. pushing them into radiation ... why, that's just mean. 
+    - sprint and run away, really fast (followed by a tired period, and/or need to rest to recharge it)
+    - leap. You can't control the distance (it's fixed), so this can be for or against you.
+    - camoflauge. as long as nobody sees you, you can sort of fade out of sight -- until you move.
+puzzles: (see phone notes)
+    - pushing blocks
+    - keys and locked doors
+    - computers where you enter commands
+    - computer panels that operate doors, perhaps multiple simultaneously (switch puzzles)
+    - combining parts/items together (eg. battery + saw = hacksaw)
