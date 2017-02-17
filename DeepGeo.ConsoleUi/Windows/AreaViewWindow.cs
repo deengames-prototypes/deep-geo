@@ -11,13 +11,13 @@ using Ninject.Parameters;
 using Ninject;
 using DeenGames.DeepGeo.ConsoleUi.ViewExtensions;
 using DeenGames.DeepGeo.Core.Maps;
+using System.Linq;
 
 namespace DeenGames.DeepGeo.ConsoleUi.Windows
 {
     class AreaViewWindow : SadConsole.Consoles.Console
     {
-        public GameObject playerEntity { get; private set; }
-        public GameObject stairsDown { get; private set; }
+        private IList<GameObject> objects = new List<GameObject>();
         private CaveFloorMap currentMap;
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
@@ -29,12 +29,16 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         public AreaViewWindow(int width, int height, int mapWidth, int mapHeight) : base(mapWidth, mapHeight)
         {
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
-            this.playerEntity = new GameObject(Engine.DefaultFont);
-            this.playerEntity.Move(1, 1);
-            this.playerEntity.DrawAs('@', Color.Orange);
+            var playerEntity = new GameObject(Engine.DefaultFont);
+            playerEntity.Name = "Player";
+            playerEntity.Move(1, 1);
+            playerEntity.DrawAs('@', Color.Orange);
+            this.objects.Add(playerEntity);
 
-            this.stairsDown = new GameObject(Engine.DefaultFont);
-            this.stairsDown.DrawAs('>', Color.White);
+            var stairsDown = new GameObject(Engine.DefaultFont);
+            stairsDown.Name = "StairsDown";
+            stairsDown.DrawAs('>', Color.White);
+            this.objects.Add(stairsDown);
 
             SadConsole.Engine.ActiveConsole = this;
             // Keyboard setup
@@ -51,13 +55,22 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         public override void Render()
         {
             base.Render();
-            playerEntity.Render();
+            foreach (var obj in this.objects)
+            {
+                if (obj.IsVisible)
+                {
+                    obj.Render();
+                }
+            }
         }
 
         public override void Update()
         {
             base.Update();
-            playerEntity.Update();
+            foreach (var obj in this.objects)
+            {
+                obj.Update();
+            }
             this.ProcessGamepad();
         }
 
@@ -120,6 +133,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private void MovePlayerBy(Point amount)
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
+            var playerEntity = this.objects.Single(g => g.Name == "Player");
             var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, PlayerLightRadius, true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
@@ -145,42 +159,67 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             {
                 var tile = this[cell.X, cell.Y];
                 tile.ClearEffect();
+
+                foreach (var obj in this.objects)
+                {
+                    if (obj.Position.X == cell.X && obj.Position.Y == cell.Y)
+                    {
+                        obj.IsVisible = true;
+                    }
+                }
             }
         }
 
+        // Marks tiles as "discovered" (50% visible). This is the same as "unmarking" visible tiles as visible.
         private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
-                // Tell the map data (for FOV calculations) that we've discovered thist ile
+                // Tell the map data (for FOV calculations) that we've discovered this tile
                 this.currentMap.MarkAsDiscovered(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable);
 
                 // Update view rendering to the appropriate effect
                 var tile = this[cell.X, cell.Y];
                 tile.ApplyEffect(DiscoveredEffect);
+
+                foreach (var obj in this.objects)
+                {
+                    if (obj.Position.X == cell.X && obj.Position.Y == cell.Y)
+                    {
+                        obj.IsVisible = false;
+                    }
+                }
             }
         }
 
         private void CenterViewToPlayer()
         {
+            var playerEntity = this.objects.Single(g => g.Name == "Player");
+
             // Scroll the view area to center the player on the screen
             TextSurface.RenderArea = new Rectangle(playerEntity.Position.X - (TextSurface.RenderArea.Width / 2),
                                                     playerEntity.Position.Y - (TextSurface.RenderArea.Height / 2),
                                                     TextSurface.RenderArea.Width, TextSurface.RenderArea.Height);
 
-            // If he view area moved, we'll keep our entity in sync with it.
-            playerEntity.RenderOffset = this.Position - TextSurface.RenderArea.Location;
+            // If he view area moved, we'll keep our entities in sync with it.
+            foreach (var obj in this.objects)
+            {
+                obj.RenderOffset = this.Position - TextSurface.RenderArea.Location;
+            }
         }
 
         private void GenerateAndDisplayMap()
         {
+            var playerEntity = this.objects.Single(g => g.Name == "Player");
+
             // Create the map
-            currentMap = new CaveFloorMap(this.Width, this.Height);
+            this.currentMap = new CaveFloorMap(this.Width, this.Height);
 
             var start = currentMap.PlayerStartPosition;
             playerEntity.Position = new Point(start.X, start.Y);
             this.CenterViewToPlayer();
 
+            var stairsDown = this.objects.Single(g => g.Name == "StairsDown");
             stairsDown.Move(currentMap.StairsDownPosition.X, currentMap.StairsDownPosition.Y);
 
             // Loop through the map information generated by RogueSharp and update our view
@@ -197,11 +236,17 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         public ICellAppearance CreateCellFor(int x, int y)
         {
-            if (this.stairsDown.Position.X == x && this.stairsDown.Position.Y == y)
+            // Objects that should appear, in darkness, should be here
+            var stairs = this.objects.Where(o => o.Name.Contains("Stairs"));
+            foreach (var s in stairs)
             {
-                return new CellAppearance(Color.White, Color.Transparent, '>');
+                if (s.Position.X == x && s.Position.Y == y)
+                {
+                    // TODO: stairs up or down
+                    return new CellAppearance(Color.DarkGray, Color.Transparent, '>');
+                }
             }
-            else if (this.currentMap.IsWalkable(x, y))
+            if (this.currentMap.IsWalkable(x, y))
             {
                 return new CellAppearance(Color.DarkGray, Color.Transparent, '.');
             }
