@@ -1,4 +1,3 @@
-dist: precise
 language: csharp
 solution: DeepGeo.sln
 install:
