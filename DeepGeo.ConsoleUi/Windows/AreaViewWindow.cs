@@ -12,9 +12,9 @@ using Ninject;
 using DeenGames.DeepGeo.ConsoleUi.ViewExtensions;
 using DeenGames.DeepGeo.Core.Maps;
 
-namespace DeenGames.DeepGeo.ConsoleUi.Consoles
+namespace DeenGames.DeepGeo.ConsoleUi.Windows
 {
-    class AreaViewConsole : SadConsole.Consoles.Console
+    class AreaViewWindow : SadConsole.Consoles.Console
     {
         public GameObject playerEntity { get; private set; }
         public GameObject stairsDown { get; private set; }
@@ -26,7 +26,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Consoles
         // TODO: should be a model
         public int PlayerLightRadius = 10;
 
-        public AreaViewConsole(int width, int height, int mapWidth, int mapHeight) : base(mapWidth, mapHeight)
+        public AreaViewWindow(int width, int height, int mapWidth, int mapHeight) : base(mapWidth, mapHeight)
         {
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
             this.playerEntity = new GameObject(Engine.DefaultFont);

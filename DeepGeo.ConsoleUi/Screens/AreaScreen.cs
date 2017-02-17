@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Console = SadConsole.Consoles.Console;
 using SadConsole.Input;
-using DeenGames.DeepGeo.ConsoleUi.Consoles;
+using DeenGames.DeepGeo.ConsoleUi.Windows;
 
 namespace DeenGames.DeepGeo.ConsoleUi.Screens
 {
@@ -16,16 +16,16 @@ namespace DeenGames.DeepGeo.ConsoleUi.Screens
     /// </summary>
     class AreaScreen : ConsoleList
     {
-        private readonly MessageAndStatusConsole messageAndStatusConsole;
-        private readonly AreaViewConsole mainView;
+        private readonly MessageAndStatusWindow messageAndStatusConsole;
+        private readonly AreaViewWindow mainView;
 
         public AreaScreen()
         {
             // Clear the default console
             SadConsole.Engine.ConsoleRenderStack.Clear();
             
-            messageAndStatusConsole = new MessageAndStatusConsole();
-            mainView = new AreaViewConsole(Config.GameWidth, Config.GameHeight - messageAndStatusConsole.Height, Config.GameWidth * 2, Config.GameHeight * 2);
+            messageAndStatusConsole = new MessageAndStatusWindow();
+            mainView = new AreaViewWindow(Config.GameWidth, Config.GameHeight - messageAndStatusConsole.Height, Config.GameWidth * 2, Config.GameHeight * 2);
 
             mainView.Position = new Point(0, 0);
             messageAndStatusConsole.Position = new Point(0, mainView.Height);

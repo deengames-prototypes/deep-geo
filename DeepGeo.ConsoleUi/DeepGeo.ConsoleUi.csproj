@@ -77,8 +77,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
-    <Compile Include="Consoles\AreaViewConsole.cs" />
-    <Compile Include="Consoles\MessageAndStatusConsole.cs" />
+    <Compile Include="Windows\AreaViewWindow.cs" />
+    <Compile Include="Windows\MessageAndStatusWindow.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
