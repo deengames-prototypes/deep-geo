@@ -11,19 +11,23 @@ using Ninject.Parameters;
 namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 {
     [TestFixture]
-    class DungeonFloorMapTests : AbstractUnitTest
+    class CaveFloorMapTests
     {
+        // Tests with these don't get a lot of collisions/churn (eg. place stairs far away from the player)
+        private const int MapWidth = 100;
+        private const int MapHeight = 50;
+
         [Test]
         public void IsWalkableReturnsTrueForWalkableTiles()
         {
-            var floor = kernel.Get<DungeonFloorMap>(new ConstructorArgument("width", 20), new ConstructorArgument("height", 20));
+            var floor = new CaveFloorMap(MapWidth, MapHeight);
             var foundFloor = false;
             var foundWall = false;
             
             // There must be at least one walkable tile and one non-walkable tile, based on the current generation strategy
-            for (var x = 0; x < 20; x++)
+            for (var x = 0; x < MapWidth; x++)
             {
-                for (var y = 0; y < 20; y++)
+                for (var y = 0; y < MapHeight; y++)
                 {
                     var walkable = floor.IsWalkable(x, y);
                     if (walkable)
@@ -39,6 +43,18 @@ namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 
             Assert.That(foundFloor, Is.EqualTo(true));
             Assert.That(foundWall, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void ConstructorCreatesStairsDownAwayFromPlayer()
+        {
+            // Stairs are randomly positioned. To avoid a flaky test, just check if the distance is non-zero.
+            var floor = new CaveFloorMap(MapWidth, MapHeight);
+            var playerPosition = floor.PlayerStartPosition;
+            var stairsDown = floor.StairsDownPosition;
+
+            var distance = Math.Abs(playerPosition.X - stairsDown.X) + Math.Abs(playerPosition.Y - stairsDown.Y);
+            Assert.That(distance, Is.GreaterThan(0));
         }
     }
 }
