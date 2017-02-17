@@ -48,8 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Maps\DungeonFloorMap.cs" />
+    <Compile Include="Entities\Stairs.cs" />
+    <Compile Include="Maps\CaveFloorMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

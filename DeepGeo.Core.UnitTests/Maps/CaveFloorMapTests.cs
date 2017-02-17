@@ -11,12 +11,12 @@ using Ninject.Parameters;
 namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 {
     [TestFixture]
-    class DungeonFloorMapTests : AbstractUnitTest
+    class CaveFloorMapTests : AbstractUnitTest
     {
         [Test]
         public void IsWalkableReturnsTrueForWalkableTiles()
         {
-            var floor = kernel.Get<DungeonFloorMap>(new ConstructorArgument("width", 20), new ConstructorArgument("height", 20));
+            var floor = kernel.Get<CaveFloorMap>(new ConstructorArgument("width", 20), new ConstructorArgument("height", 20));
             var foundFloor = false;
             var foundWall = false;
             

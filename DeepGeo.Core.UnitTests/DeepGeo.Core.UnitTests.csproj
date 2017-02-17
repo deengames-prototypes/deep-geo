@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractUnitTest.cs" />
-    <Compile Include="Maps\DungeonFloorMapTests.cs" />
+    <Compile Include="Maps\CaveFloorMapTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
