@@ -23,7 +23,7 @@ namespace DeenGames.DeepGeo.Core.Maps
         public CaveFloorMap(int width, int height)
         {
             this.random = new RogueSharp.Random.DotNetRandom();
-            // If you specify width=20, RogueSharp's map x-index goes from 0..20 inclusive. That's not what we want.
+            // If you specify width=20, RogueSharp's map x-index goes from 0..20 inclusive. That's not what we want. Hence, -1
             this.width = width - 1;
             this.height = height - 1;
 
@@ -46,19 +46,16 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
-        public Point FindEmptyPosition()
+        private Point FindEmptyPosition()
         {
             // Position the player somewhere on a walkable square
             int x = this.random.Next(1, this.width - 1);
             int y = this.random.Next(1, this.height - 1);
 
-            Console.WriteLine($"TileData is {tileData.Width}x{tileData.Height} and we're looking at {x}, {y}");
-
             while (!(tileData.IsWalkable(x, y)) || (stairsDown.X == x && stairsDown.Y == y))
             {
                 x = this.random.Next(this.width);
                 y = this.random.Next(this.height);
-                Console.WriteLine($"TileData is {tileData.Width}x{tileData.Height} and we're looking at {x}, {y}");
             }
 
             return new Point(x, y);
