@@ -24,7 +24,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         
         // TODO: should be a model
-        public int PlayerLightRadius = 10;
+        public int PlayerLightRadius = 100;
 
         public AreaViewWindow(int width, int height, int mapWidth, int mapHeight) : base(mapWidth, mapHeight)
         {
