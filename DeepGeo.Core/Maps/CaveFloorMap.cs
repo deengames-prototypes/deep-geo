@@ -44,11 +44,6 @@ namespace DeenGames.DeepGeo.Core.Maps
                 distanceSquared = Math.Pow(Math.Min(this.width, this.height), 2);
                 tries += 1;
             }
-
-            /// hurrrrrrrrrrr.......
-            this.stairsDown.Move(this.PlayerStartPosition);
-
-            Console.WriteLine($"You're at {PlayerStartPosition} and it's at {StairsDownPosition}");
         }
 
         private Point FindEmptyPosition()
