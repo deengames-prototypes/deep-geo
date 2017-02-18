@@ -7,16 +7,11 @@ using System.Threading.Tasks;
 
 namespace DeenGames.DeepGeo.Core.Entities
 {
-    public class Stairs
+    public class Stairs : Entity
     {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-
-        // TODO: make this a common method
-        public void Move(Point position)
+        public Stairs() : base('>', new ColourTuple(255, 255, 255))
         {
-            this.X = position.X;
-            this.Y = position.Y;
+
         }
     }
 }

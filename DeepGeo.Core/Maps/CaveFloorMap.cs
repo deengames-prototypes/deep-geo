@@ -11,6 +11,10 @@ namespace DeenGames.DeepGeo.Core.Maps
 {
     public class CaveFloorMap
     {
+        // TODO: externalize in a global config JSON file, as per prototyping process
+        private const float PushPuzzleProbability = 100; // 30
+        private const int PushPuzzleBlocks = 6;
+
         public Point PlayerStartPosition { get; private set; }
 
         private RogueSharp.Map tileData;
@@ -20,6 +24,8 @@ namespace DeenGames.DeepGeo.Core.Maps
         private Stairs stairsDown;
         private IRandom random;
 
+        private List<Entity> entities = new List<Entity>();
+
         public CaveFloorMap(int width, int height)
         {
             this.random = new RogueSharp.Random.DotNetRandom();
@@ -27,6 +33,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             this.width = width - 1;
             this.height = height - 1;
 
+            //var mapCreationStrategy = new RogueSharp.MapCreation.RandomRoomsMapCreationStrategy<RogueSharp.Map>(width, height, 100, 15, 4);
             var mapCreationStrategy = new RogueSharp.MapCreation.BorderOnlyMapCreationStrategy<RogueSharp.Map>(width, height);
             this.tileData = RogueSharp.Map.Create(mapCreationStrategy);
 
@@ -44,6 +51,77 @@ namespace DeenGames.DeepGeo.Core.Maps
                 distanceSquared = Math.Pow(Math.Min(this.width, this.height), 2);
                 tries += 1;
             }
+
+            if (random.Next(100) <= PushPuzzleProbability)
+            {
+                this.GeneratePushPuzzle();
+            }
+        }
+
+        public bool IsWalkable(int x, int y)
+        {
+            // TODO: make sure there are no entities there, eg. player, monster
+            return this.tileData.IsWalkable(x, y);
+        }
+
+        public IMap GetIMap()
+        {
+            return this.tileData;
+        }
+
+        public void MarkAsDiscovered(int x, int y, bool isTransparent, bool isWalkable)
+        {
+            this.tileData.SetCellProperties(x, y, isTransparent, isWalkable, true);
+        }
+
+        public Point StairsDownPosition
+        {
+            get
+            {
+                return new Point(this.stairsDown.X, this.stairsDown.Y);
+            }
+        }
+
+        public IReadOnlyCollection<Entity> Objects
+        {
+            get
+            {
+                return this.entities.AsReadOnly();
+            }
+        }
+
+        private void GeneratePushPuzzle()
+        {
+            // Generate a bunch of stuff you have to push into place in a pattern
+            // This is reminiscent of the old Lufia 2 puzzles. 
+
+            // TODO: challenging to find a space to fit this into. Make one?
+            // TODO: does this unlock a key? Open a door to the stairs down?
+            // TODO: if you mess up, can you restart? Or can you pull blocks?
+
+            // Simple: generate five blocks of alternating colours in a line.
+            // Player has to reassemble them in a grid.
+
+            var start = this.FindEmptyPosition();
+            var red = new ColourTuple(192, 64, 64);
+            var blue = new ColourTuple(64, 64, 192);
+
+            // TODO: don't assume we're in a six-by-three open area
+            for (var i = 0; i < 6; i++)
+            {
+                // Block
+                var colour = i % 2 == 0 ? red : blue;
+                var opposite = colour == red ? blue : red;
+                var block = new PushBlock(colour);
+                block.Move(new Point(start.X + i, start.Y));
+                this.entities.Add(block);
+
+                // Matching receptacle
+                var receptacle = new PushReceptacle(opposite);
+                receptacle.Move(new Point(start.X + (i % 3), start.Y + 1 + (i / 3))); // rows of three below blocks
+                Console.WriteLine(receptacle.X + ", " + receptacle.Y);
+                this.entities.Add(receptacle);
+            }            
         }
 
         private Point FindEmptyPosition()
@@ -60,31 +138,5 @@ namespace DeenGames.DeepGeo.Core.Maps
 
             return new Point(x, y);
         }
-
-        public bool IsWalkable(int x, int y)
-        {
-            // TODO: make sure there are no entities there, eg. player, monster
-            return this.tileData.IsWalkable(x, y); 
-        }
-
-        public IMap GetIMap()
-        {
-            return this.tileData;
-        }
-
-        public void MarkAsDiscovered(int x, int y, bool isTransparent, bool isWalkable)
-        {
-            this.tileData.SetCellProperties(x, y, isTransparent, isWalkable, true);
-            
-        }
-
-        public Point StairsDownPosition
-        {
-            get
-            {
-                return new Point(this.stairsDown.X, this.stairsDown.Y);
-            }
-        }
-
     }
 }
