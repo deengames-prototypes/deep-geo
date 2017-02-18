@@ -27,7 +27,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             this.width = width - 1;
             this.height = height - 1;
 
-            var mapCreationStrategy = new RogueSharp.MapCreation.RandomRoomsMapCreationStrategy<RogueSharp.Map>(width, height, 100, 15, 4);
+            var mapCreationStrategy = new RogueSharp.MapCreation.BorderOnlyMapCreationStrategy<RogueSharp.Map>(width, height);
             this.tileData = RogueSharp.Map.Create(mapCreationStrategy);
 
             this.stairsDown = new Entities.Stairs();

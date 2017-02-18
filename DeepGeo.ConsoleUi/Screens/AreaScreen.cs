@@ -25,7 +25,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Screens
             SadConsole.Engine.ConsoleRenderStack.Clear();
             
             messageAndStatusConsole = new MessageAndStatusWindow();
-            mainView = new AreaViewWindow(Config.GameWidth, Config.GameHeight - messageAndStatusConsole.Height, Config.GameWidth * 2, Config.GameHeight * 2);
+            mainView = new AreaViewWindow(Config.GameWidth, Config.GameHeight - messageAndStatusConsole.Height, Config.GameWidth, Config.GameHeight);
 
             mainView.Position = new Point(0, 0);
             messageAndStatusConsole.Position = new Point(0, mainView.Height);
