@@ -29,5 +29,10 @@ namespace DeenGames.DeepGeo.Core.IO
         {
             return this.data[key].Value<T>();
         }
+
+        public override string ToString()
+        {
+            return data.ToString();
+        }
     }
 }

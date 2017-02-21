@@ -44,7 +44,7 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
 
             // Wait for it to refresh
             Thread.Sleep(100);
-            Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"), $"Config contents: {File.ReadAllText("data/config.json")}");
+            Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"), $"Config contents: {File.ReadAllText("data/config.json")} vs. Data: {config.ToString()}");
         }
 
         public void SetConfigJson(string contents)
