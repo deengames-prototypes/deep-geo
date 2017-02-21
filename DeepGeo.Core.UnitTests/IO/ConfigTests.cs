@@ -41,6 +41,7 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         {
             var config = new Config("data/config.json");
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("AES"));
+            Console.WriteLine("@@@@@@@@@ new value written @@@@@@@@@@@");
             this.SetConfigJson("{ 'Algorithm': 'MD5' }");
             FileWatcher.TurboMode = true;
 
