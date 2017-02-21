@@ -10,11 +10,15 @@ using System.Threading.Tasks;
 namespace DeenGames.DeepGeo.Core.IO.UnitTests
 {
     [TestFixture]
+    // While these tests are flaky, the contents are unlikely to ever change.
+    // The Config class is very simple, and doesn't require much.
     class ConfigTests
     {
         [SetUp]
         public void ResetConfigJson()
         {
+            Directory.Delete("data", true);
+            Directory.CreateDirectory("data");
             this.SetConfigJson("{ 'IsConfigWorking': true, 'NumberOfTimesTested': 3701, 'Algorithm': 'AES'}");
         }
 
@@ -32,17 +36,12 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         {
             var config = new Config("data/config.json");
             File.WriteAllText("data/config.json", "{ 'Algorithm': 'MD5' }");
-            // This is not a great unit test, sorry. We just need basic testing here.
             Thread.Sleep(100);
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"));
         }
 
         public void SetConfigJson(string contents)
         {
-            if (!Directory.Exists("data"))
-            {
-                Directory.CreateDirectory("data");
-            }
             File.WriteAllText("data/config.json", contents);
         }
     }
