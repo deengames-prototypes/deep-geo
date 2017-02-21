@@ -16,6 +16,7 @@ namespace DeenGames.DeepGeo.Core.IO
         private readonly Timer timer;
         private readonly FileInfo fileInfo;
         private DateTime lastUpdated;
+        private DateTime lastCreated;
 
         private static List<FileWatcher> watchers = new List<FileWatcher>();
 
@@ -58,10 +59,11 @@ namespace DeenGames.DeepGeo.Core.IO
                     Console.WriteLine($"old={this.fileInfo.LastWriteTime.Ticks}, new={this.lastUpdated.Ticks}");
             }
 
-            if (this.fileInfo.LastWriteTime != this.lastUpdated)
+            if (this.fileInfo.LastWriteTime != this.lastUpdated || this.fileInfo.CreationTime != this.lastCreated)
             {
                 Console.WriteLine("@@@@@@");
                 this.lastUpdated = this.fileInfo.LastWriteTime;
+                this.lastCreated = this.fileInfo.CreationTime;
                 var contents = File.ReadAllText(fileInfo.FullName);
                 onUpdateCallback(contents);
             }
