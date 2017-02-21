@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace DeenGames.DeepGeo.ConsoleUi
 {
     /// <summary>
-    /// Gets global configuration. Yes, it's evil, because it's used everywhere.
-    /// Checks config.json and returns that value (if present), otherwise returns the constant value.
+    /// Gets global configuration for the view only. Yes, it's evil, because it's used everywhere.
     /// </summary>
     public static class Config
     {

@@ -119,7 +119,6 @@ namespace DeenGames.DeepGeo.Core.Maps
                 // Matching receptacle
                 var receptacle = new PushReceptacle(opposite);
                 receptacle.Move(new Point(start.X + (i % 3), start.Y + 1 + (i / 3))); // rows of three below blocks
-                Console.WriteLine(receptacle.X + ", " + receptacle.Y);
                 this.entities.Add(receptacle);
             }            
         }
