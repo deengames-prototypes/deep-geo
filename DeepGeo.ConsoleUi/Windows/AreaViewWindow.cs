@@ -24,9 +24,6 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         
-        // TODO: should be a model
-        public int PlayerLightRadius = 100;
-
         public AreaViewWindow(int width, int height, int mapWidth, int mapHeight) : base(mapWidth, mapHeight)
         {
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
@@ -41,7 +38,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             this.GenerateAndDisplayMap();
 
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, PlayerLightRadius, true);
+            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
         }
 
@@ -126,7 +123,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var playerEntity = this.objects.Single(g => g.Name == "Player");
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, PlayerLightRadius, true);
+            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
 
@@ -141,7 +138,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 CenterViewToPlayer();
             }
 
-            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, PlayerLightRadius, true);
+            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
         }
 

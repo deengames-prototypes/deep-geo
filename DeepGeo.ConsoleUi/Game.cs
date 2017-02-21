@@ -16,6 +16,8 @@ namespace DeenGames.DeepGeo.ConsoleUi
     {
         public Game()
         {
+            // Load all data. Accessible later via Config.Instance
+            new Core.IO.Config("Assets/Data/config.json");
         }
 
         public void Run()
