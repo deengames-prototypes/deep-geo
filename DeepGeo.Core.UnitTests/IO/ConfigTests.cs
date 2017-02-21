@@ -39,6 +39,10 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
 
         public void SetConfigJson(string contents)
         {
+            if (!Directory.Exists("data"))
+            {
+                Directory.CreateDirectory("data");
+            }
             File.WriteAllText("data/config.json", contents);
         }
     }
