@@ -40,7 +40,7 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         {
             var config = new Config("data/config.json");
             File.WriteAllText("data/config.json", "{ 'Algorithm': 'MD5' }");
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"));
         }
 
