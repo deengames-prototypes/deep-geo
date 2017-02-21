@@ -50,7 +50,7 @@ namespace DeenGames.DeepGeo.Core.IO
             this.fileInfo.Refresh();
             if (this.fileInfo.LastWriteTime != this.lastUpdated)
             {
-                Console.WriteLine($"File updated to {this.lastUpdated}; previous value was {this.fileInfo.LastWriteTime}");
+                Console.WriteLine($"{this.fileInfo.Name} updated to {this.lastUpdated}; previous value was {this.fileInfo.LastWriteTime}");
                 this.lastUpdated = this.fileInfo.LastWriteTime;
                 var contents = File.ReadAllText(fileInfo.FullName);
                 onUpdateCallback(contents);
