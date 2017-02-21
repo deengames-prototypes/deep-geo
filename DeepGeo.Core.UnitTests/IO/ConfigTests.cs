@@ -42,9 +42,10 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
             var config = new Config("data/config.json");
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("AES"));
             this.SetConfigJson("{ 'Algorithm': 'MD5' }");
+            FileWatcher.TurboMode = true;
 
             // Wait for it to refresh
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"), $"Config contents: {File.ReadAllText("data/config.json")} vs. Data: {config.ToString()}");
         }
 
