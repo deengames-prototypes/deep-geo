@@ -19,9 +19,8 @@ namespace DeenGames.DeepGeo.Core.IO
         public Config(string configFile)
         {
             instance = this;
-            new FileWatcher(configFile, () =>
+            new FileWatcher(configFile, (contents) =>
             {
-                var contents = File.ReadAllText(configFile);
                 this.data = JsonConvert.DeserializeObject<JObject>(contents);
             }).Watch();
         }

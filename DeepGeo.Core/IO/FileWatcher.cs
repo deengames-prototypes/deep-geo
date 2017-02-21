@@ -10,14 +10,14 @@ namespace DeenGames.DeepGeo.Core.IO
 {
     public class FileWatcher
     {
-        private readonly Action onUpdateCallback;
+        private readonly Action<string> onUpdateCallback;
         private readonly Timer timer;
         private readonly FileInfo fileInfo;
         private DateTime lastUpdated;
 
         private static List<FileWatcher> watchers = new List<FileWatcher>();
 
-        public FileWatcher(string fileName, Action onUpdateCallback)
+        public FileWatcher(string fileName, Action<string> onUpdateCallback)
         {
             this.onUpdateCallback = onUpdateCallback;
 
@@ -51,7 +51,8 @@ namespace DeenGames.DeepGeo.Core.IO
             if (this.fileInfo.LastWriteTime != this.lastUpdated)
             {
                 this.lastUpdated = this.fileInfo.LastWriteTime;
-                onUpdateCallback();
+                var contents = File.ReadAllText(fileInfo.FullName);
+                onUpdateCallback(contents);
             }
         }
     }
