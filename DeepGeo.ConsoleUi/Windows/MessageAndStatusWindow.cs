@@ -14,7 +14,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
     {
         private const int MyHeight = 3;
 
-        public MessageAndStatusWindow() : base(Config.GameWidth, MyHeight)
+        public MessageAndStatusWindow() : base(UiConfig.GameWidth, MyHeight)
         {
             this.CanUseKeyboard = false;
         }

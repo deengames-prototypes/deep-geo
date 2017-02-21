@@ -83,7 +83,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
+    <Compile Include="UiConfig.cs" />
     <Compile Include="Windows\AreaViewWindow.cs" />
     <Compile Include="Windows\MessageAndStatusWindow.cs" />
     <Compile Include="Game.cs" />

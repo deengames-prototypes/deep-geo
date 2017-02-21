@@ -17,13 +17,13 @@ namespace DeenGames.DeepGeo.ConsoleUi
         public Game()
         {
             // Load all data. Accessible later via Config.Instance
-            new Core.IO.Config("Assets/Data/config.json");
+            new Config("Assets/Data/config.json");
         }
 
         public void Run()
         {
             // Setup the engine and creat the main window.
-            SadConsole.Engine.Initialize("Assets/Fonts/IBM.font", Config.GameWidth, Config.GameHeight);
+            SadConsole.Engine.Initialize("Assets/Fonts/IBM.font", UiConfig.GameWidth, UiConfig.GameHeight);
 
             // Hook the start event so we can add consoles to the system.
             SadConsole.Engine.EngineStart += (sender, eventArgs) =>

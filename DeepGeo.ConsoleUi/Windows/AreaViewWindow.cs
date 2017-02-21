@@ -13,6 +13,7 @@ using DeenGames.DeepGeo.ConsoleUi.ViewExtensions;
 using DeenGames.DeepGeo.Core.Maps;
 using System.Linq;
 using DeenGames.DeepGeo.Core.Entities;
+using DeenGames.DeepGeo.Core.IO;
 
 namespace DeenGames.DeepGeo.ConsoleUi.Windows
 {
@@ -24,7 +25,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         
-        public AreaViewWindow(int width, int height) : base(Core.IO.Config.Instance.Get<int>("MapWidth"), Core.IO.Config.Instance.Get<int>("MapHeight"))
+        public AreaViewWindow(int width, int height) : base(Config.Instance.Get<int>("MapWidth"), Config.Instance.Get<int>("MapHeight"))
         {
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
             var playerEntity = this.CreateGameObject("Player", '@', Color.Orange, new Point(1, 1));
@@ -38,7 +39,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             this.GenerateAndDisplayMap();
 
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
+            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
         }
 
@@ -123,7 +124,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var playerEntity = this.objects.Single(g => g.Name == "Player");
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
+            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
 
@@ -138,7 +139,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 CenterViewToPlayer();
             }
 
-            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Core.IO.Config.Instance.Get<int>("PlayerLightRadius"), true);
+            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
         }
 
@@ -200,8 +201,8 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private void GenerateAndDisplayMap()
         {
             var playerEntity = this.objects.Single(g => g.Name == "Player");
-            var mapWidth = Core.IO.Config.Instance.Get<int>("MapWidth");
-            var mapHeight = Core.IO.Config.Instance.Get<int>("MapHeight");
+            var mapWidth = Config.Instance.Get<int>("MapWidth");
+            var mapHeight = Config.Instance.Get<int>("MapHeight");
 
             // Create the map
             this.currentMap = new CaveFloorMap(mapWidth, mapHeight);
