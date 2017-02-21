@@ -21,7 +21,10 @@ namespace DeenGames.DeepGeo.Core.IO
             instance = this;
             new FileWatcher(configFile, (contents) =>
             {
+                Console.WriteLine($"@@@ got update: setting data to {contents}");
                 this.data = JsonConvert.DeserializeObject<JObject>(contents);
+                Console.WriteLine($"@@@ set done; my data is {this.ToString()}");
+
             }).Watch();
         }
 

@@ -26,6 +26,7 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
             this.SetConfigJson("{ 'IsConfigWorking': true, 'NumberOfTimesTested': 3701, 'Algorithm': 'AES'}");
         }
 
+        [Ignore]
         [Test]
         public void GetGetsValueFromConfigDotJson()
         {
