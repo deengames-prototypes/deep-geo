@@ -39,9 +39,11 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         public void GetGetsUpdatedValueIfFileChanges()
         {
             var config = new Config("data/config.json");
-            File.WriteAllText("data/config.json", "{ 'Algorithm': 'MD5' }");
-            Thread.Sleep(10000);
-            Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"));
+            Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("AES"));
+
+            this.SetConfigJson("{ 'Algorithm': 'MD5' }");
+            Thread.Sleep(100);
+            Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("MD5"), $"Config contents: {File.ReadAllText("data/config.json")}");
         }
 
         public void SetConfigJson(string contents)
