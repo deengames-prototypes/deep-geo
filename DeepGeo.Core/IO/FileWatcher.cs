@@ -10,8 +10,6 @@ namespace DeenGames.DeepGeo.Core.IO
 {
     public class FileWatcher
     {
-        public static bool TurboMode = false;
-
         private readonly Action<string> onUpdateCallback;
         private readonly Timer timer;
         private readonly FileInfo fileInfo;
@@ -51,17 +49,10 @@ namespace DeenGames.DeepGeo.Core.IO
         private void OnTick()
         {
             this.fileInfo.Refresh();
-            if (FileWatcher.TurboMode)
-            {
-                if (this.fileInfo.LastWriteTime != this.lastUpdated)
-                    Console.WriteLine($"*** old={this.fileInfo.LastWriteTime.Ticks}, new={this.lastUpdated.Ticks}");
-                else
-                    Console.WriteLine($"old={this.fileInfo.LastWriteTime.Ticks}, new={this.lastUpdated.Ticks}");
-            }
 
+            // On Xamarin, LastWriteTime may not update. But CreationTime does update.
             if (this.fileInfo.LastWriteTime != this.lastUpdated || this.fileInfo.CreationTime != this.lastCreated)
             {
-                Console.WriteLine("@@@@@@");
                 this.lastUpdated = this.fileInfo.LastWriteTime;
                 this.lastCreated = this.fileInfo.CreationTime;
                 var contents = File.ReadAllText(fileInfo.FullName);
