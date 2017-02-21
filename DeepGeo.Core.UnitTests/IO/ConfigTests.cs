@@ -40,9 +40,6 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         {
             var config = new Config("data/config.json");
             Assert.That(config.Get<string>("Algorithm"), Is.EqualTo("AES"));
-
-            // Make sure the file gets written to with a different config date/time
-            Thread.Sleep(1);
             this.SetConfigJson("{ 'Algorithm': 'MD5' }");
 
             // Wait for it to refresh
