@@ -26,7 +26,7 @@ namespace DeenGames.DeepGeo.Core.IO
             watcher.EnableRaisingEvents = true;
             
             // Notify if create/write times changed
-            this.watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+            this.watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.Attributes;
             watcher.Changed += (source, e) =>
             {
                 // Notification is when file is first accessed; could be locked by the OS for a few ms
