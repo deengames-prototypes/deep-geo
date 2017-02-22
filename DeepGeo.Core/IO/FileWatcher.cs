@@ -31,7 +31,7 @@ namespace DeenGames.DeepGeo.Core.IO
             {
                 // Notification is when file is first accessed; could be locked by the OS for a few ms
                 // try/catch is hideous (and the performance is hideous). This is slightly better.
-                Thread.Sleep(25);
+                Thread.Sleep(500);
                 var contents = File.ReadAllText(e.FullPath);
                 onUpdateCallback(contents);
             };
