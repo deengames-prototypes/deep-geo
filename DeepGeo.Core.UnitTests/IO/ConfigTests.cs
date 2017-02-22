@@ -17,12 +17,10 @@ namespace DeenGames.DeepGeo.Core.IO.UnitTests
         [SetUp]
         public void ResetConfigJson()
         {
-            if (Directory.Exists("data"))
+            if (!Directory.Exists("data"))
             {
-                Directory.Delete("data", true);
+                Directory.CreateDirectory("data");
             }
-
-            Directory.CreateDirectory("data");
             this.SetConfigJson("{ 'IsConfigWorking': true, 'NumberOfTimesTested': 3701, 'Algorithm': 'AES'}");
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -11,23 +12,29 @@ namespace DeenGames.DeepGeo.Core.IO
     public class FileWatcher
     {
         private readonly Action<string> onUpdateCallback;
-        private readonly Timer timer;
-        private readonly FileInfo fileInfo;
-        private DateTime lastUpdated;
-        private DateTime lastCreated;
-
-        private static List<FileWatcher> watchers = new List<FileWatcher>();
+        private string fileName;
+        private readonly FileSystemWatcher watcher;
 
         public FileWatcher(string fileName, Action<string> onUpdateCallback)
         {
+            this.fileName = fileName;
             this.onUpdateCallback = onUpdateCallback;
 
-            this.timer = new Timer(TimeSpan.FromSeconds(0.1).TotalSeconds);
-            this.timer.Elapsed += (s, e) => this.OnTick();
-
-            this.fileInfo = new FileInfo(fileName);
-
-            watchers.Add(this);
+            var path = fileName.Substring(0, fileName.LastIndexOf("/"));
+            var nameOnly = fileName.Substring(fileName.LastIndexOf("/") + 1);
+            this.watcher = new FileSystemWatcher(path, nameOnly);
+            watcher.EnableRaisingEvents = true;
+            
+            // Notify if create/write times changed
+            this.watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+            watcher.Changed += (source, e) =>
+            {
+                // Notification is when file is first accessed; could be locked by the OS for a few ms
+                // try/catch is hideous (and the performance is hideous). This is slightly better.
+                Thread.Sleep(25);
+                var contents = File.ReadAllText(e.FullPath);
+                onUpdateCallback(contents);
+            };
         }
 
         /// <summary>
@@ -37,27 +44,7 @@ namespace DeenGames.DeepGeo.Core.IO
         /// </summary>
         public void Watch()
         {
-            this.OnTick();
-            this.timer.Start();
-        }
-
-        public void Stop()
-        {
-            this.timer.Stop();
-        }
-
-        private void OnTick()
-        {
-            this.fileInfo.Refresh();
-
-            // On Xamarin, LastWriteTime may not update. But CreationTime does update.
-            if (this.fileInfo.LastWriteTime != this.lastUpdated || this.fileInfo.CreationTime != this.lastCreated)
-            {
-                this.lastUpdated = this.fileInfo.LastWriteTime;
-                this.lastCreated = this.fileInfo.CreationTime;
-                var contents = File.ReadAllText(fileInfo.FullName);
-                onUpdateCallback(contents);
-            }
+            this.onUpdateCallback(File.ReadAllText(this.fileName));
         }
     }
 }
