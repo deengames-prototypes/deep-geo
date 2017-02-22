@@ -22,19 +22,12 @@ namespace DeenGames.DeepGeo.Core.IO
 
             var path = fileName.Substring(0, fileName.LastIndexOf("/"));
             var nameOnly = fileName.Substring(fileName.LastIndexOf("/") + 1);
+
             this.watcher = new FileSystemWatcher(path, nameOnly);
-            watcher.EnableRaisingEvents = true;
-            
+            watcher.EnableRaisingEvents = true; // Doesn't raise events without this            
             // Notify if create/write times changed
-            this.watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite | NotifyFilters.Attributes;
-            watcher.Changed += (source, e) =>
-            {
-                // Notification is when file is first accessed; could be locked by the OS for a few ms
-                // try/catch is hideous (and the performance is hideous). This is slightly better.
-                Thread.Sleep(500);
-                var contents = File.ReadAllText(e.FullPath);
-                onUpdateCallback(contents);
-            };
+            this.watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
+            
         }
 
         /// <summary>
@@ -44,6 +37,17 @@ namespace DeenGames.DeepGeo.Core.IO
         /// </summary>
         public void Watch()
         {
+            watcher.Changed += (source, e) =>
+            {
+                // Notification is when file is first accessed; could be locked by the OS for a few ms.
+                // Try/catch is hideous (and the performance is hideous). This is slightly better.
+                // NB: this usually fires twice when the file changes once. That's okay here.
+                Thread.Sleep(25);
+                var contents = File.ReadAllText(e.FullPath);
+                onUpdateCallback(contents);
+            };
+
+            // Fire immediately
             this.onUpdateCallback(File.ReadAllText(this.fileName));
         }
     }

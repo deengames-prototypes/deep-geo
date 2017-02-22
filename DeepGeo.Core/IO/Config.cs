@@ -22,7 +22,6 @@ namespace DeenGames.DeepGeo.Core.IO
             new FileWatcher(configFile, (contents) =>
             {
                 this.data = JsonConvert.DeserializeObject<JObject>(contents);
-
             }).Watch();
         }
 
