@@ -93,19 +93,35 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         public bool IsBlockPuzzleComplete()
         {
-            var receptacles = this.entities.Where(e => e is PushReceptacle);
-            var blocks = this.entities.Where(e => e is PushBlock);
+            var receptacles = this.entities.Where(e => e is PushReceptacle).Select(e => e as PushReceptacle);
+            var blocks = this.entities.Where(e => e is PushBlock).Select(e => e as PushBlock);
             int matched = 0;
 
             foreach (var r in receptacles)
             {
-                if (blocks.SingleOrDefault(b => b.X == r.X && b.Y == r.Y && b.Colour == r.Colour) != null)
+                if (blocks.SingleOrDefault(b => b.X == r.X && b.Y == r.Y && b.Match == r.Match) != null)
                 {
                     matched += 1;
                 }
             }
 
             return matched == receptacles.Count();            
+        }
+
+        public Key DeleteBlocksAndSpawnKey()
+        {
+            var toDelete = this.entities.Where(e => e is PushReceptacle || e is PushBlock).ToList();
+            var r = toDelete[this.random.Next(toDelete.Count)];
+            var position = new Point(r.X, r.Y);
+
+            foreach (var e in toDelete)
+            {
+                this.entities.Remove(e);
+            }
+
+            var toReturn = new Key();
+            toReturn.Move(position);
+            return toReturn;
         }
 
         private void GeneratePushPuzzle()
@@ -123,7 +139,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             {
                 // Block
                 var colour = i % 2 == 0 ? red : blue;
-                var block = new PushBlock(colour);
+                var block = new PushBlock(colour, colour == red ? "Red" : "Blue");
                 block.Move(this.FindEmptyPosition());
                 this.entities.Add(block);
             }
@@ -138,16 +154,20 @@ namespace DeenGames.DeepGeo.Core.Maps
                     this.IsWalkable(startingPoint.X, startingPoint.Y + 1) && this.IsWalkable(startingPoint.X + 1, startingPoint.Y + 1) && this.IsWalkable(startingPoint.X + 2, startingPoint.Y + 1))
                 {
                     foundEmptySpace = true;
-                } else
+                }
+                else
                 {
                     startingPoint = this.FindEmptyPosition();
                 }
             }
 
+            red = new ColourTuple(192, 64, 0);
+            blue = new ColourTuple(64, 64, 192);
+
             for (var i = 0; i < Config.Instance.Get<int>("PushPuzzleBlocks"); i++)
             {
                 var colour = i % 2 == 0 ? red : blue;
-                var receptacle = new PushReceptacle(colour);
+                var receptacle = new PushReceptacle(colour, colour == red ? "Red" : "Blue");
                 var position = new Point(startingPoint.X + (i % 3), startingPoint.Y + (i / 3));
                 receptacle.Move(position);
                 this.entities.Add(receptacle);

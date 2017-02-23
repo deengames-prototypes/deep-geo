@@ -12,8 +12,11 @@ namespace DeenGames.DeepGeo.Core.Entities
     /// </summary>
     public class PushReceptacle : Entity
     {
-        public PushReceptacle(ColourTuple colour) : base('*', colour, false)
+        public readonly string Match;
+
+        public PushReceptacle(ColourTuple colour, string matchBlocks) : base('*', colour, false)
         {
+            this.Match = matchBlocks;
         }
     }
 }

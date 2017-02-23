@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Affordances.cs" />
+    <Compile Include="Entities\Key.cs" />
     <Compile Include="IO\Config.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\PushBlock.cs" />

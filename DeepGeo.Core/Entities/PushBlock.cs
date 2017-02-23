@@ -12,8 +12,11 @@ namespace DeenGames.DeepGeo.Core.Entities
     /// </summary>
     public class PushBlock : Entity, Pushable, Pullable
     {
-        public PushBlock(ColourTuple colour) : base('0', colour, true)
+        public readonly string Match;
+
+        public PushBlock(ColourTuple colour, string matchOn) : base('0', colour, true)
         {
+            this.Match = matchOn;
         }
     }
 }
