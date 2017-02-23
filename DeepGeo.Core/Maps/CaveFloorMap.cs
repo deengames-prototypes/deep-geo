@@ -91,6 +91,23 @@ namespace DeenGames.DeepGeo.Core.Maps
             return this.entities.Where(e => e.X == x && e.Y == y);
         }
 
+        public bool IsBlockPuzzleComplete()
+        {
+            var receptacles = this.entities.Where(e => e is PushReceptacle);
+            var blocks = this.entities.Where(e => e is PushBlock);
+            int matched = 0;
+
+            foreach (var r in receptacles)
+            {
+                if (blocks.SingleOrDefault(b => b.X == r.X && b.Y == r.Y && b.Colour == r.Colour) != null)
+                {
+                    matched += 1;
+                }
+            }
+
+            return matched == receptacles.Count();            
+        }
+
         private void GeneratePushPuzzle()
         {
             // Generate a bunch of stuff you have to push into place in a pattern

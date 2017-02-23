@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace DeenGames.DeepGeo.ConsoleUi.SadConsoleHelpers
 {
+    // ModelView (view with reference to model object)
     class GameObjectWithData : GameObject
     {
         public Entity Data { get; private set; }

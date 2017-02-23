@@ -186,19 +186,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private void CheckIfBlockPuzzleIsComplete()
         {
-            var receptacles = this.objects.Where(o => o.Data is PushReceptacle);
-            var blocks = this.objects.Where(o => o.Data is PushBlock);
-            int matched = 0;
-
-            foreach (var r in receptacles)
-            {
-                if (blocks.SingleOrDefault(b => b.Position == r.Position && b.Data.Colour == r.Data.Colour) != null)
-                {
-                    matched += 1;
-                }
-            }
-
-            if (matched == receptacles.Count())
+            if (currentMap.IsBlockPuzzleComplete())
             {
                 this.showMessageCallback("You hear a 'click' sound.");
             }

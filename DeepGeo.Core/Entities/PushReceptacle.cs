@@ -8,6 +8,7 @@ namespace DeenGames.DeepGeo.Core.Entities
 {
     /// <summary>
     /// Something you push PushBlocks onto for push puzzles.
+    /// TODO: convert to data
     /// </summary>
     public class PushReceptacle : Entity
     {
