@@ -1,4 +1,5 @@
 ﻿using DeenGames.DeepGeo.Core.Entities;
+using DeenGames.DeepGeo.Core.IO;
 using RogueSharp;
 using RogueSharp.Random;
 using System;
@@ -11,9 +12,8 @@ namespace DeenGames.DeepGeo.Core.Maps
 {
     public class CaveFloorMap
     {
-        // TODO: externalize in a global config JSON file, as per prototyping process
-        private const float PushPuzzleProbability = 100; // 30
-        private const int PushPuzzleBlocks = 6;
+        private float PushPuzzleProbability;
+        private int PushPuzzleBlocks;
 
         public Point PlayerStartPosition { get; private set; }
 
@@ -28,13 +28,16 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         public CaveFloorMap(int width, int height)
         {
+            this.PushPuzzleProbability = Config.Instance.Get<int>("PuzzlePushProbability");
+            this.PushPuzzleBlocks = Config.Instance.Get<int>("PushPuzzleBlocks");
+
             this.random = new RogueSharp.Random.DotNetRandom();
             // If you specify width=20, RogueSharp's map x-index goes from 0..20 inclusive. That's not what we want. Hence, -1
             this.width = width - 1;
             this.height = height - 1;
 
-            //var mapCreationStrategy = new RogueSharp.MapCreation.RandomRoomsMapCreationStrategy<RogueSharp.Map>(width, height, 100, 15, 4);
-            var mapCreationStrategy = new RogueSharp.MapCreation.BorderOnlyMapCreationStrategy<RogueSharp.Map>(width, height);
+            var mapCreationStrategy = new RogueSharp.MapCreation.RandomRoomsMapCreationStrategy<RogueSharp.Map>(width, height, 100, 15, 4);
+            //var mapCreationStrategy = new RogueSharp.MapCreation.CaveMapCreationStrategy<RogueSharp.Map>(width, height, 40, 2, 1);
             this.tileData = RogueSharp.Map.Create(mapCreationStrategy);
 
             this.stairsDown = new Entities.Stairs();

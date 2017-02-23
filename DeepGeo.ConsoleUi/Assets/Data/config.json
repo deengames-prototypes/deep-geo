@@ -1,5 +1,7 @@
 ﻿{
-  "PlayerLightRadius": 100,
-  "MapWidth": 80,
-  "MapHeight":  22
+    "PlayerLightRadius": 100,
+    "MapWidth": 80,
+    "MapHeight": 22,
+    "PuzzlePushProbability": 100,
+    "PushPuzzleBlocks":  6
 }
