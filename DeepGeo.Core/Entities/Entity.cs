@@ -11,13 +11,15 @@ namespace DeenGames.DeepGeo.Core.Entities
     {
         public int X { get; private set; }
         public int Y { get; private set; }
+        public bool IsSolid { get; private set; }
         public char DisplayCharacter { get; private set; }
         public ColourTuple Colour { get; private set; }
 
-        public Entity(char displayCharacter, ColourTuple colour)
+        public Entity(char displayCharacter, ColourTuple colour, bool isSolid)
         {
             this.DisplayCharacter = displayCharacter;
             this.Colour = colour;
+            this.IsSolid = isSolid;
         }
 
         public Entity Move(Point position)

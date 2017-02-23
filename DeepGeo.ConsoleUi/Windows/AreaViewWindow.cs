@@ -24,7 +24,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
-        
+
         public AreaViewWindow(int width, int height) : base(Config.Instance.Get<int>("MapWidth"), Config.Instance.Get<int>("MapHeight"))
         {
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
@@ -69,7 +69,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             // Check the device for Player One
             GamePadCapabilities capabilities = GamePad.GetCapabilities(PlayerIndex.One);
-            
+
             // If there a controller attached, handle it
             if (capabilities.IsConnected)
             {
@@ -81,16 +81,20 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 if (capabilities.HasLeftXThumbStick)
                 {
                     // Check teh direction in X axis of left analog stick
-                    if (state.ThumbSticks.Left.X < -0.5f) {
+                    if (state.ThumbSticks.Left.X < -0.5f)
+                    {
                         this.MovePlayerBy(new Point(-1, 0));
                     }
-                    else if (state.ThumbSticks.Left.X > 0.5f) {
+                    else if (state.ThumbSticks.Left.X > 0.5f)
+                    {
                         this.MovePlayerBy(new Point(1, 0));
-                    } 
-                    else if (state.ThumbSticks.Left.Y < -0.5f) {
+                    }
+                    else if (state.ThumbSticks.Left.Y < -0.5f)
+                    {
                         this.MovePlayerBy(new Point(0, 1));
                     }
-                    else if (state.ThumbSticks.Left.Y > 0.5f) {
+                    else if (state.ThumbSticks.Left.Y > 0.5f)
+                    {
                         this.MovePlayerBy(new Point(0, -1));
                     }
                 }
@@ -231,7 +235,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 }
             }
         }
-        
+
         private ICellAppearance CreateCellFor(int x, int y)
         {
             // Objects that should appear, in darkness, should be here
@@ -244,14 +248,19 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     return new CellAppearance(Color.DarkGray, Color.Transparent, '>');
                 }
             }
-            if (this.currentMap.IsWalkable(x, y))
+
+            // If there's something on it, don't draw anything
+            if (this.currentMap.Objects.Any(e => e.X == x && e.Y == y))
+            {
+                return new CellAppearance(Color.DarkGray, Color.Transparent, ' ');
+            }
+            else if (this.currentMap.IsWalkable(x, y))
             {
                 return new CellAppearance(Color.DarkGray, Color.Transparent, '.');
             }
             else
             {
                 return new CellAppearance(Color.LightGray, Color.Transparent, '#');
-
             }
         }
 

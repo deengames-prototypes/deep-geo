@@ -9,9 +9,8 @@ namespace DeenGames.DeepGeo.Core.Entities
 {
     public class Stairs : Entity
     {
-        public Stairs() : base('>', new ColourTuple(255, 255, 255))
+        public Stairs() : base('>', new ColourTuple(255, 255, 255), false)
         {
-
         }
     }
 }

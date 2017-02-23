@@ -11,11 +11,8 @@ namespace DeenGames.DeepGeo.Core.Entities
     /// </summary>
     public class PushReceptacle : Entity
     {
-        public ColourTuple Colour { get; private set; }
-
-        public PushReceptacle(ColourTuple colour) : base('*', colour)
+        public PushReceptacle(ColourTuple colour) : base('*', colour, false)
         {
-            this.Colour = colour;
         }
     }
 }

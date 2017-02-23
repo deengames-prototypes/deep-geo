@@ -11,11 +11,8 @@ namespace DeenGames.DeepGeo.Core.Entities
     /// </summary>
     public class PushBlock : Entity
     {
-        public ColourTuple Colour { get; private set; }
-
-        public PushBlock(ColourTuple colour) : base('0', colour)
+        public PushBlock(ColourTuple colour) : base('0', colour, true)
         {
-            this.Colour = colour;
         }
     }
 }

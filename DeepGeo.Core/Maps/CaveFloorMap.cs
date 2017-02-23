@@ -57,8 +57,7 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         public bool IsWalkable(int x, int y)
         {
-            // TODO: make sure there are no entities there, eg. player, monster
-            return this.tileData.IsWalkable(x, y);
+            return this.tileData.IsWalkable(x, y) && !this.entities.Any(e => e.X == x && e.Y == y && e.IsSolid == true);
         }
 
         public IMap GetIMap()
