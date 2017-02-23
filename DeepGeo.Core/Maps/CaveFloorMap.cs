@@ -99,8 +99,8 @@ namespace DeenGames.DeepGeo.Core.Maps
             // Simple: generate blocks of alternating colours in a line.
             // Player has to reassemble them in a grid.
 
-            var red = new ColourTuple(192, 64, 64);
-            var blue = new ColourTuple(64, 64, 192);
+            var red = new ColourTuple(255, 0, 0);
+            var blue = new ColourTuple(0, 0, 255);
 
             for (var i = 0; i < Config.Instance.Get<int>("PushPuzzleBlocks"); i++)
             {
