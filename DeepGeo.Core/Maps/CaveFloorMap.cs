@@ -86,9 +86,9 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
-        public Entity GetObjectAt(int x, int y)
+        public IEnumerable<Entity> GetObjectsAt(int x, int y)
         {
-            return this.entities.SingleOrDefault(e => e.X == x && e.Y == y);
+            return this.entities.Where(e => e.X == x && e.Y == y);
         }
 
         private void GeneratePushPuzzle()
