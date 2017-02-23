@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Ninject;
 using Ninject.Parameters;
+using System.IO;
+using DeenGames.DeepGeo.Core.IO;
 
 namespace DeenGames.DeepGeo.Core.UnitTests.Maps
 {
@@ -20,6 +22,9 @@ namespace DeenGames.DeepGeo.Core.UnitTests.Maps
         [Test]
         public void IsWalkableReturnsTrueForWalkableTiles()
         {
+            File.WriteAllText("data/config.json", "{ 'PuzzlePushProbability': 0 }");
+            new Config("data/config.json");
+
             var floor = new CaveFloorMap(MapWidth, MapHeight);
             var foundFloor = false;
             var foundWall = false;
