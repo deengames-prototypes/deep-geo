@@ -105,26 +105,26 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Down)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.S)))
             {
-                this.MovePlayerBy(new Point(0, 1));
+                this.MovePlayerBy(new Point(0, 1), info);
             }
             else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Up)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.W)))
             {
-                this.MovePlayerBy(new Point(0, -1));
+                this.MovePlayerBy(new Point(0, -1), info);
             }
 
             if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Right)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.D)))
             {
-                this.MovePlayerBy(new Point(1, 0));
+                this.MovePlayerBy(new Point(1, 0), info);
             }
             else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Left)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.A)))
             {
-                this.MovePlayerBy(new Point(-1, 0));
+                this.MovePlayerBy(new Point(-1, 0), info);
             }
 
             return false;
         }
 
-        private void MovePlayerBy(Point amount)
+        private void MovePlayerBy(Point amount, KeyboardInfo info = null)
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var playerEntity = this.objects.Single(g => g.Name == "Player");
@@ -135,7 +135,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             // Get the position the player will be at
             Point newPosition = playerEntity.Position + amount;
             // Is there a block there?
-            if (currentMap.GetObjectAt(newPosition.X, newPosition.Y) is PushBlock)
+            if (currentMap.GetObjectAt(newPosition.X, newPosition.Y) is Pushable)
             {
                 // Is there an empty space behind it?
                 var behindBlock = newPosition + amount;
@@ -151,6 +151,22 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             // Check to see if the position is within the map and walkable
             if (new Rectangle(0, 0, Width, Height).Contains(newPosition) && currentMap.IsWalkable(newPosition.X, newPosition.Y))
             {
+                // Pull a block along if specified
+                if (info.KeysDown.Contains(AsciiKey.Get(Keys.Space)))
+                {
+                    // Are you holding space? Did you move in a direction (eg. left) and there's a push block on the other side (eg. right)?
+                    // If so, and if the target block position is walkable, pull it along. But this only works if you're pulling
+                    // in the direction you're moving (eg. standing on top and pulling a block upward), NOT standing beside a block
+                    // and pulling it upward or standing above a block and pulling to the left/right
+                    var currentBlockPos = playerEntity.Position + new Point(amount.X * -1, amount.Y * -1);
+                    if (currentMap.GetObjectAt(currentBlockPos.X, currentBlockPos.Y) is Pullable)
+                    {
+                        // Given constraints above, target position is current player position
+                        currentMap.GetObjectAt(currentBlockPos.X, currentBlockPos.Y).Move(playerEntity.Position.X, playerEntity.Position.Y);
+                        this.objects.Single(g => g.Position == currentBlockPos).Move(playerEntity.Position.X, playerEntity.Position.Y);
+                    }
+                }
+
                 // Move the player
                 playerEntity.Position += amount;
                 CenterViewToPlayer();
