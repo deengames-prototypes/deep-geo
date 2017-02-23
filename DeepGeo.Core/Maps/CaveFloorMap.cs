@@ -105,7 +105,7 @@ namespace DeenGames.DeepGeo.Core.Maps
                 }
             }
 
-            return matched == receptacles.Count();            
+            return matched > 0 && matched == receptacles.Count();            
         }
 
         public Key DeleteBlocksAndSpawnKey()
@@ -121,6 +121,7 @@ namespace DeenGames.DeepGeo.Core.Maps
 
             var toReturn = new Key();
             toReturn.Move(position);
+            this.entities.Add(toReturn);
             return toReturn;
         }
 
@@ -187,6 +188,11 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
 
             return new Point(x, y);
+        }
+
+        public void Remove(Entity e)
+        {
+            this.entities.Remove(e);
         }
     }
 }

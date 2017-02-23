@@ -180,6 +180,19 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 CenterViewToPlayer();
             }
 
+            var key = this.currentMap.GetObjectsAt(playerEntity.Position.X, playerEntity.Position.Y).Where(s => s is Key).SingleOrDefault();
+            if (key != null)
+            {
+                // Not sure why two keys are spawned here
+                var keys = this.objects.Where(s => s.Data == key).ToList();
+                foreach (var k in keys)
+                {
+                    this.objects.Remove(k);
+                    this.currentMap.Remove(key);
+                }
+                this.showMessageCallback("Got a key.");
+            }
+
             fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
         }
