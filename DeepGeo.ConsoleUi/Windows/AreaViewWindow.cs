@@ -133,9 +133,22 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             this.MarkCurrentFovAsDiscovered(fovTiles);
 
             // Get the position the player will be at
-            Microsoft.Xna.Framework.Point newPosition = playerEntity.Position + amount;
+            Point newPosition = playerEntity.Position + amount;
+            // Is there a block there?
+            if (currentMap.GetObjectAt(newPosition.X, newPosition.Y) is PushBlock)
+            {
+                // Is there an empty space behind it?
+                var behindBlock = newPosition + amount;
+                if (currentMap.IsWalkable(behindBlock.X, behindBlock.Y))
+                {
+                    // Push it (update data)
+                    currentMap.GetObjectAt(newPosition.X, newPosition.Y).Move(behindBlock.X, behindBlock.Y);
+                    // Push it (move view object)
+                    this.objects.Single(g => g.Position == newPosition).Move(behindBlock.X, behindBlock.Y);
+                }
+            }
 
-            // Check to see if the position is within the map
+            // Check to see if the position is within the map and walkable
             if (new Rectangle(0, 0, Width, Height).Contains(newPosition) && currentMap.IsWalkable(newPosition.X, newPosition.Y))
             {
                 // Move the player

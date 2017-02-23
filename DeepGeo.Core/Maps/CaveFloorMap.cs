@@ -86,6 +86,11 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
+        public Entity GetObjectAt(int x, int y)
+        {
+            return this.entities.SingleOrDefault(e => e.X == x && e.Y == y);
+        }
+
         private void GeneratePushPuzzle()
         {
             // Generate a bunch of stuff you have to push into place in a pattern

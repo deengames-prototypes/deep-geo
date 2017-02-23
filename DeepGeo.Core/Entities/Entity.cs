@@ -22,11 +22,16 @@ namespace DeenGames.DeepGeo.Core.Entities
             this.IsSolid = isSolid;
         }
 
+        public Entity Move(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+            return this;
+        }
+
         public Entity Move(Point position)
         {
-            this.X = position.X;
-            this.Y = position.Y;
-            return this;
+            return this.Move(position.X, position.Y);
         }
     }
 
