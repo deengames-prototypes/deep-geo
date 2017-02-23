@@ -12,4 +12,4 @@ mono:
   # - sleep 3 # give xvfb some time to start
 script:
   - xbuild /p:Configuration=Release DeepGeo.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./DeepGeo.Core.UnitTests/bin/Release/DeenGames.DeepGeo.Core.UnitTests.dll
+  # - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./DeepGeo.Core.UnitTests/bin/Release/DeenGames.DeepGeo.Core.UnitTests.dll
