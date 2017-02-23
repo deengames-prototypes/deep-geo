@@ -26,8 +26,11 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
 
-        public AreaViewWindow(int width, int height) : base(Config.Instance.Get<int>("MapWidth"), Config.Instance.Get<int>("MapHeight"))
+        private Action<string> showMessageCallback;
+
+        public AreaViewWindow(int width, int height, Action<string> showMessageCallback) : base(Config.Instance.Get<int>("MapWidth"), Config.Instance.Get<int>("MapHeight"))
         {
+            this.showMessageCallback = showMessageCallback;
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
             var playerEntity = this.CreateGameObject("Player", '@', Color.Orange, new Point(1, 1));
             this.CreateGameObject("StairsDown", '>', Color.White);
@@ -147,6 +150,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     obj.Move(behindBlock.X, behindBlock.Y);
                     // Push it (move view object)
                     this.objects.Single(g => g.Data == obj).Move(behindBlock.X, behindBlock.Y);
+                    this.CheckIfBlockPuzzleIsComplete();
                 }
             }
 
@@ -167,6 +171,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                         var obj = currentMap.GetObjectsAt(currentBlockPos.X, currentBlockPos.Y).Single(e => e is Pullable);
                         obj.Move(playerEntity.Position.X, playerEntity.Position.Y);
                         this.objects.Single(g => g.Data == obj).Move(playerEntity.Position.X, playerEntity.Position.Y);
+                        this.CheckIfBlockPuzzleIsComplete();
                     }
                 }
 
@@ -177,6 +182,26 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
             fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
+        }
+
+        private void CheckIfBlockPuzzleIsComplete()
+        {
+            var receptacles = this.objects.Where(o => o.Data is PushReceptacle);
+            var blocks = this.objects.Where(o => o.Data is PushBlock);
+            int matched = 0;
+
+            foreach (var r in receptacles)
+            {
+                if (blocks.SingleOrDefault(b => b.Position == r.Position && b.Data.Colour == r.Data.Colour) != null)
+                {
+                    matched += 1;
+                }
+            }
+
+            if (matched == receptacles.Count())
+            {
+                this.showMessageCallback("You hear a 'click' sound.");
+            }
         }
 
         private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.Cell> fovTiles)

@@ -25,7 +25,8 @@ namespace DeenGames.DeepGeo.ConsoleUi.Screens
             SadConsole.Engine.ConsoleRenderStack.Clear();
             
             messageAndStatusConsole = new MessageAndStatusWindow();
-            mainView = new AreaViewWindow(UiConfig.GameWidth, UiConfig.GameHeight - messageAndStatusConsole.Height);
+            mainView = new AreaViewWindow(UiConfig.GameWidth, UiConfig.GameHeight - messageAndStatusConsole.Height,
+                (message) => messageAndStatusConsole.ShowMessage(message));
 
             mainView.Position = new Point(0, 0);
             messageAndStatusConsole.Position = new Point(0, mainView.Height);
@@ -33,9 +34,9 @@ namespace DeenGames.DeepGeo.ConsoleUi.Screens
             this.Add(mainView);
             this.Add(messageAndStatusConsole);
 
-            messageAndStatusConsole.ShowMessage("First message");
-            messageAndStatusConsole.ShowMessage("SECOND message");
-            messageAndStatusConsole.ShowMessage("3rd message");
+            //messageAndStatusConsole.ShowMessage("First message");
+            //messageAndStatusConsole.ShowMessage("SECOND message");
+            //messageAndStatusConsole.ShowMessage("3rd message");
         }
     }
 }
