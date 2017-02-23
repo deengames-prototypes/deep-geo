@@ -12,9 +12,6 @@ namespace DeenGames.DeepGeo.Core.Maps
 {
     public class CaveFloorMap
     {
-        private float PushPuzzleProbability;
-        private int PushPuzzleBlocks;
-
         public Point PlayerStartPosition { get; private set; }
 
         private RogueSharp.Map tileData;
@@ -28,9 +25,6 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         public CaveFloorMap(int width, int height)
         {
-            this.PushPuzzleProbability = Config.Instance.Get<int>("PuzzlePushProbability");
-            this.PushPuzzleBlocks = Config.Instance.Get<int>("PushPuzzleBlocks");
-
             this.random = new RogueSharp.Random.DotNetRandom();
             // If you specify width=20, RogueSharp's map x-index goes from 0..20 inclusive. That's not what we want. Hence, -1
             this.width = width - 1;
@@ -55,7 +49,7 @@ namespace DeenGames.DeepGeo.Core.Maps
                 tries += 1;
             }
 
-            if (random.Next(100) <= PushPuzzleProbability)
+            if (random.Next(100) <= Config.Instance.Get<int>("PuzzlePushProbability"))
             {
                 this.GeneratePushPuzzle();
             }
@@ -96,34 +90,47 @@ namespace DeenGames.DeepGeo.Core.Maps
         private void GeneratePushPuzzle()
         {
             // Generate a bunch of stuff you have to push into place in a pattern
-            // This is reminiscent of the old Lufia 2 puzzles. 
+            // This is reminiscent of the old Lufia 2 block-pushing puzzles. 
 
-            // TODO: challenging to find a space to fit this into. Make one?
-            // TODO: does this unlock a key? Open a door to the stairs down?
-            // TODO: if you mess up, can you restart? Or can you pull blocks?
-
-            // Simple: generate five blocks of alternating colours in a line.
+            // Simple: generate blocks of alternating colours in a line.
             // Player has to reassemble them in a grid.
 
-            var start = this.FindEmptyPosition();
             var red = new ColourTuple(192, 64, 64);
             var blue = new ColourTuple(64, 64, 192);
 
-            // TODO: don't assume we're in a six-by-three open area
-            for (var i = 0; i < 6; i++)
+            for (var i = 0; i < Config.Instance.Get<int>("PushPuzzleBlocks"); i++)
             {
                 // Block
                 var colour = i % 2 == 0 ? red : blue;
-                var opposite = colour == red ? blue : red;
                 var block = new PushBlock(colour);
-                block.Move(new Point(start.X + i, start.Y));
+                block.Move(this.FindEmptyPosition());
                 this.entities.Add(block);
+            }
 
-                // Matching receptacle
-                var receptacle = new PushReceptacle(opposite);
-                receptacle.Move(new Point(start.X + (i % 3), start.Y + 1 + (i / 3))); // rows of three below blocks
+            bool foundEmptySpace = false;
+            Point startingPoint = this.FindEmptyPosition();
+
+            while (!foundEmptySpace)
+            {
+                // Empty 3x2 space
+                if (this.IsWalkable(startingPoint.X, startingPoint.Y) && this.IsWalkable(startingPoint.X + 1, startingPoint.Y) && this.IsWalkable(startingPoint.X + 2, startingPoint.Y) &&
+                    this.IsWalkable(startingPoint.X, startingPoint.Y + 1) && this.IsWalkable(startingPoint.X + 1, startingPoint.Y + 1) && this.IsWalkable(startingPoint.X + 2, startingPoint.Y + 1))
+                {
+                    foundEmptySpace = true;
+                } else
+                {
+                    startingPoint = this.FindEmptyPosition();
+                }
+            }
+
+            for (var i = 0; i < Config.Instance.Get<int>("PushPuzzleBlocks"); i++)
+            {
+                var colour = i % 2 == 0 ? red : blue;
+                var receptacle = new PushReceptacle(colour);
+                var position = new Point(startingPoint.X + (i % 3), startingPoint.Y + (i / 3));
+                receptacle.Move(position);
                 this.entities.Add(receptacle);
-            }            
+            }
         }
 
         private Point FindEmptyPosition()
