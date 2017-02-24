@@ -3,5 +3,6 @@
     "MapWidth": 80,
     "MapHeight": 22,
     "PuzzlePushProbability": 100,
-    "PushPuzzleBlocks":  6
+    "PushPuzzleBlocks": 6,
+    "NumberLockedDoors":  10
 }

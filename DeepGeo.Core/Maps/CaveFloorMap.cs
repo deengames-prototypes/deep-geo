@@ -53,11 +53,14 @@ namespace DeenGames.DeepGeo.Core.Maps
             {
                 this.GeneratePushPuzzle();
             }
+
+            this.GenerateLockedDoorsAndKeys();
         }
 
         public bool IsWalkable(int x, int y)
         {
-            return this.tileData.IsWalkable(x, y) && !this.entities.Any(e => e.X == x && e.Y == y && e.IsSolid == true);
+            return x > 0 && y > 0 && x < this.width && y < this.height &&
+                this.tileData.IsWalkable(x, y) && !this.entities.Any(e => e.X == x && e.Y == y && e.IsSolid == true);
         }
 
         public IMap GetIMap()
@@ -193,6 +196,57 @@ namespace DeenGames.DeepGeo.Core.Maps
         public void Remove(Entity e)
         {
             this.entities.Remove(e);
+        }
+
+        private void GenerateLockedDoorsAndKeys()
+        {
+            int iterations = 0;
+            int numToGenerate = Config.Instance.Get<int>("NumberLockedDoors");
+            int generated = 0;
+            int radiusUsed = 4;
+            var nearStairs = new List<Cell>();
+
+            while (generated < numToGenerate)
+            {
+                iterations++;
+
+                if (!nearStairs.Any())
+                {
+                    nearStairs = this.tileData.GetCellsInArea(this.stairsDown.X, this.stairsDown.Y, radiusUsed).OrderBy(r => random.Next(1000)).ToList();
+                    radiusUsed *= 2;
+                }
+
+                var spot = nearStairs.First();
+                nearStairs.Remove(spot);
+
+                // Try to find spots near the stairs
+                var left = this.IsWalkable(spot.X - 1, spot.Y);
+                var right = this.IsWalkable(spot.X + 1, spot.Y);
+                var up = this.IsWalkable(spot.X, spot.Y - 1);
+                var down = this.IsWalkable(spot.X, spot.Y + 1);
+
+                if ((!left && !right && up && down) || (left && right && !up && !down))
+                {
+                    var door = new LockedDoor();
+                    door.Move(spot.X, spot.Y);
+                    this.entities.Add(door);
+                    generated++;
+                }
+            }
+
+            // Generate less keys than doors. If there's a block puzzle,
+            // and if you can complete it, that'll give you an extra key.
+            generated = 0;
+            var numKeys = Math.Ceiling(2 * numToGenerate / 3f);
+
+            while (generated < numKeys)
+            {
+                var spot = this.FindEmptyPosition();
+                var key = new Key();
+                key.Move(spot);
+                this.entities.Add(key);
+                generated++;
+            }
         }
     }
 }
