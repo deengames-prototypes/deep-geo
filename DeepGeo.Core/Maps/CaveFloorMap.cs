@@ -111,20 +111,26 @@ namespace DeenGames.DeepGeo.Core.Maps
             return matched > 0 && matched == receptacles.Count();            
         }
 
-        public Key DeleteBlocksAndSpawnKey()
+        public IEnumerable<Key> DeleteBlocksAndSpawnKeys()
         {
             var toDelete = this.entities.Where(e => e is PushReceptacle || e is PushBlock).ToList();
-            var r = toDelete[this.random.Next(toDelete.Count)];
-            var position = new Point(r.X, r.Y);
+            var spots = toDelete.OrderBy(t => random.Next(100)).Take(Config.Instance.Get<int>("KeysForBlockPuzzle"));
 
             foreach (var e in toDelete)
             {
                 this.entities.Remove(e);
             }
 
-            var toReturn = new Key();
-            toReturn.Move(position);
-            this.entities.Add(toReturn);
+            var toReturn = new List<Key>();
+
+            foreach (var spot in spots)
+            {
+                var key = new Key();
+                key.Move(spot.X, spot.Y);
+                this.entities.Add(key);
+                toReturn.Add(key);
+            }
+
             return toReturn;
         }
 
@@ -235,7 +241,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
 
             // Generate less keys than doors. If there's a block puzzle,
-            // and if you can complete it, that'll give you an extra key.
+            // and if you can complete it, that'll give you an extra few keys.
             generated = 0;
             var numKeys = Math.Ceiling(2 * numToGenerate / 3f);
 

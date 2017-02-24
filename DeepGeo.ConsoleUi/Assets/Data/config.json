@@ -4,5 +4,6 @@
     "MapHeight": 22,
     "PuzzlePushProbability": 100,
     "PushPuzzleBlocks": 6,
-    "NumberLockedDoors":  10
+    "NumberLockedDoors": 10,
+    "KeysForBlockPuzzle":  3
 }

@@ -32,7 +32,9 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             this.showMessageCallback = showMessageCallback;
             this.TextSurface.RenderArea = new Rectangle(0, 0, width, height);
-            var playerEntity = this.CreateGameObject("Player", '@', Color.Orange, new Point(1, 1));
+
+            var player = new Player();
+            var playerEntity = this.CreateGameObject("Player", player);
             this.CreateGameObject("StairsDown", '>', Color.White);
 
             SadConsole.Engine.ActiveConsole = this;
@@ -135,11 +137,12 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
-
+            
             // Get the position the player will be at
             Point newPosition = playerEntity.Position + amount;
+            
             // Is there a block there?
-            if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
+                if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
             {
                 // Is there an empty space behind it?
                 var behindBlock = newPosition + amount;
@@ -190,7 +193,25 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     this.objects.Remove(k);
                     this.currentMap.Remove(key);
                 }
+                
+                (this.objects.Single(o => o.Data is Player).Data as Player).Keys += 1;
                 this.showMessageCallback("Got a key.");
+            }
+
+            // Door there, and we have a key? Unlock it!
+            if ((playerEntity.Data as Player).Keys > 0 && this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(o => o is LockedDoor))
+            {
+                var doorData = this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Where(o => o is LockedDoor).ToList();
+                var doors = this.objects.Where(o => doorData.Contains(o.Data)).ToList();
+
+                // Why, why WHY are there multiple copies?
+                foreach (var door in doors)
+                {
+                    this.objects.Remove(door);
+                    this.currentMap.Remove(door.Data);
+                }
+                showMessageCallback("You unlock the door.");
+                (playerEntity.Data as Player).Keys -= 1;
             }
 
             fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
@@ -201,7 +222,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             if (currentMap.IsBlockPuzzleComplete())
             {
-                var key = currentMap.DeleteBlocksAndSpawnKey();
+                var keys = currentMap.DeleteBlocksAndSpawnKeys();
 
                 var toDelete = this.objects.Where(o => o.Data is PushReceptacle || o.Data is PushBlock).ToList();
                 foreach (var e in toDelete)
@@ -209,7 +230,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     this.objects.Remove(e);
                 }
 
-                this.objects.Add(this.CreateGameObject("Key", key));
+                foreach (var key in keys)
+                {
+                    this.objects.Add(this.CreateGameObject("Key", key));
+                }
             }
         }
 
