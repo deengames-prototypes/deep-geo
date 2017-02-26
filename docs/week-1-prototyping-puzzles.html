@@ -9,7 +9,7 @@
     <meta name="author" content="ashes999">
     <link rel="icon" href="content/favicon.ico">
 
-    <title>Deep Geo Devlog</title>
+    <title>Week 1: Prototyping Puzzles | Deep Geo Devlog</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" crossorigin="anonymous">
@@ -59,10 +59,40 @@ if (window.location.href.indexOf('file://') == -1) {
         <div class="col-sm-8 blog-main">
 
           <div class="blog-post">
-            <h2 class="blog-post-title"><butterfly-title /></h2>
-            <butterfly-post-date class="blog-post-meta" prefix="Posted on "/>
-            <ul><li><a href="week-1-prototyping-puzzles.html">Week 1: Prototyping Puzzles</a> (2017-02-24)</li><li><a href="week-0-planning.html">Week 0: Planning</a> (2017-02-17)</li></ul>
-            <butterfly-comments />
+            <h2 class="blog-post-title">Week 1: Prototyping Puzzles</h2>
+            <p class="blog-post-meta">Posted on 2017-02-24</p>
+            
+<p>A wanted to create a non-combat-focused roguelike with Deep Geo. This necessitates interersting, non-combat mechanics. I settled on three ideas; this week, I implemented two ideas.</p>
+<h1>Push/Pull Block Puzzles</h1>
+<p>Inspired by Lufia 2, 30% of floors generate a push/pull puzzle. Six barrels appear on the floor (three red and three blue), and six receptacles where you have to place a barrel of the matching colour.</p>
+<p>You can push the blocks, and also pull them by holding space and moving:</p>
+<p><img src="content/images/gifs/week-1-barrels.gif" alt="pushing and pulling blocks" /></p>
+<p>Placing all six barrels on matching receptacles solves the puzzle and nets three keys. Which brings us to the next idea.</p>
+<h1>Locked Doors and keys</h1>
+<p>Few roguelikes use the concept of key-locked doors. While this is hard to generate meaningfully (how can I guarantee that you need to get keys to lock doors? How can I make sure this is solvable and keys are not behind locked doors?), one advantage of roguelikes is that you can always go back up a floor and come back down to generate a new floor.</p>
+<p>Keys are pretty simple: any key can unlock any locked door.</p>
+<p><img src="content/images/gifs/week-1-keys.gif" alt="keys and doors" /> </p>
+<p>Next week, I plan to implement the third feature (switch puzzles which simultaneously activate multiple doors). If that goes well, I can add monsters, and see if/how the puzzles work with actual monsters hounding you.</p>
+
+            <div id="disqus_thread"></div>
+<script type="text/javascript">
+
+var disqus_config = function () {
+  this.page.url = "http://deengames-prototypes.github.io/deep-geo/week-1-prototyping-puzzles"; // Absolute page URL
+  this.page.identifier = "4c9ede3b0ec43a961b2d7fb1e6497bc8da5e8f70"; // Any unique, stable string identifier
+};
+
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = 'http://butterflyhx.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
           </div>
 
           <!--nav>

@@ -3,7 +3,31 @@
         <title>Deep Geo Devlog</title>
         <link href="http://deengames-prototypes.github.io/deep-geo" />
         <id>urn:uuid:83ade4416d08024891d78f55ed986679</id>
-  	    <updated>2017-02-17T00:00:00Z</updated><entry>
+  	    <updated>2017-02-24T00:00:00Z</updated><entry>
+      		<title>Week 1: Prototyping Puzzles</title>
+          <link href="http://deengames-prototypes.github.io/deep-geo/week-1-prototyping-puzzles" />
+      		<id>urn:uuid:89e3cf227dfc22bca628ff354a3f9b75</id>
+      		<updated>2017-02-24T00:00:00Z</updated>
+      		<summary>Week 1: Prototyping Puzzles</summary>
+      		<content type="xhtml">
+      			&lt;p&gt;A wanted to create a non-combat-focused roguelike with Deep Geo. This necessitates interersting, non-combat mechanics. I settled on three ideas; this week, I implemented two ideas.&lt;/p&gt;
+&lt;h1&gt;Push/Pull Block Puzzles&lt;/h1&gt;
+&lt;p&gt;Inspired by Lufia 2, 30% of floors generate a push/pull puzzle. Six barrels appear on the floor (three red and three blue), and six receptacles where you have to place a barrel of the matching colour.&lt;/p&gt;
+&lt;p&gt;You can push the blocks, and also pull them by holding space and moving:&lt;/p&gt;
+&lt;p&gt;&lt;img src="content/images/gifs/week-1-barrels.gif" alt="pushing and pulling blocks" /&gt;&lt;/p&gt;
+&lt;p&gt;Placing all six barrels on matching receptacles solves the puzzle and nets three keys. Which brings us to the next idea.&lt;/p&gt;
+&lt;h1&gt;Locked Doors and keys&lt;/h1&gt;
+&lt;p&gt;Few roguelikes use the concept of key-locked doors. While this is hard to generate meaningfully (how can I guarantee that you need to get keys to lock doors? How can I make sure this is solvable and keys are not behind locked doors?), one advantage of roguelikes is that you can always go back up a floor and come back down to generate a new floor.&lt;/p&gt;
+&lt;p&gt;Keys are pretty simple: any key can unlock any locked door.&lt;/p&gt;
+&lt;p&gt;&lt;img src="content/images/gifs/week-1-keys.gif" alt="keys and doors" /&gt; &lt;/p&gt;
+&lt;p&gt;Next week, I plan to implement the third feature (switch puzzles which simultaneously activate multiple doors). If that goes well, I can add monsters, and see if/how the puzzles work with actual monsters hounding you.&lt;/p&gt;
+      		</content>
+      		<author>
+      			<name>ashes999</name>
+      			<email>ashes999@yahoo.com</email>
+      		</author>
+      	</entry>
+      	<entry>
       		<title>Week 0: Planning</title>
           <link href="http://deengames-prototypes.github.io/deep-geo/week-0-planning" />
       		<id>urn:uuid:870602053a67d206658a7ca3e0bc021a</id>
