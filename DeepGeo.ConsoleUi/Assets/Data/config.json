@@ -2,8 +2,11 @@
     "PlayerLightRadius": 100,
     "MapWidth": 80,
     "MapHeight": 22,
-    "PuzzlePushProbability": 100,
+    "PushPuzzleProbability": 100,
     "PushPuzzleBlocks": 6,
     "NumberLockedDoors": 10,
-    "KeysForBlockPuzzle":  3
+    "KeysForBlockPuzzle": 3,
+    "SwitchPuzzleProbability":  100,
+    "Switches": 2,
+    "SwitchDoors": 10
 }

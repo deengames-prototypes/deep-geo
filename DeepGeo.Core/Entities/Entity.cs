@@ -11,9 +11,9 @@ namespace DeenGames.DeepGeo.Core.Entities
     {
         public int X { get; private set; }
         public int Y { get; private set; }
-        public bool IsSolid { get; private set; }
+        public bool IsSolid { get; protected set; }
         public char DisplayCharacter { get; private set; }
-        public ColourTuple Colour { get; private set; }
+        public ColourTuple Colour { get; internal set; }
 
         public Entity(char displayCharacter, ColourTuple colour, bool isSolid)
         {

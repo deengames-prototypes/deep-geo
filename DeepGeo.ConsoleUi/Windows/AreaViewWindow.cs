@@ -56,6 +56,21 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             {
                 if (obj.IsVisible)
                 {
+                    // Special case for switch doors
+                    if (obj.Data is SwitchDoor)
+                    {
+                        var cell = obj.RenderCells[0].ActualForeground;
+
+                        if ((obj.Data as SwitchDoor).IsOpen)
+                        {
+                            obj.RenderCells[0].ActualForeground = new Color(cell.R, cell.G, cell.B, 0.5f); // transparent
+                        }
+                        else
+                        {
+                            obj.RenderCells[0].ActualForeground = new Color(cell.R, cell.G, cell.B, 1f);   // 100% opaque
+                        }
+                    }
+
                     obj.Render();
                 }
             }
@@ -127,6 +142,27 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 this.MovePlayerBy(new Point(-1, 0), info);
             }
 
+            if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Space)))
+            {
+                var switches = this.objects.Where(o => o.Data is Switch);
+                var player = this.objects.Single(o => o.Data is Player);
+                foreach (var s in switches)
+                {
+                    if ((Math.Abs(s.Position.X - player.Position.X) + Math.Abs(s.Position.Y - player.Position.Y)) <= 1)
+                    {
+                        (s.Data as Switch).Flip();
+                        this.currentMap.FlipSwitches();
+
+                        foreach (var w in switches)
+                        {
+                            w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.Red, s.Data.Colour.Green, s.Data.Colour.Blue);
+                        }
+
+                        showMessageCallback("You flip the switch.");
+                    }
+                }
+            }
+
             return false;
         }
 
@@ -142,7 +178,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             Point newPosition = playerEntity.Position + amount;
             
             // Is there a block there?
-                if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
+            if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
             {
                 // Is there an empty space behind it?
                 var behindBlock = newPosition + amount;

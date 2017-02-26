@@ -49,12 +49,17 @@ namespace DeenGames.DeepGeo.Core.Maps
                 tries += 1;
             }
 
-            if (random.Next(100) <= Config.Instance.Get<int>("PuzzlePushProbability"))
+            if (random.Next(100) <= Config.Instance.Get<int>("PushPuzzleProbability"))
             {
                 this.GeneratePushPuzzle();
             }
 
             this.GenerateLockedDoorsAndKeys();
+
+            if (random.Next(100) <= Config.Instance.Get<int>("SwitchPuzzleProbability"))
+            {
+                this.GenerateSwitchPuzzle();
+            }
         }
 
         public bool IsWalkable(int x, int y)
@@ -134,6 +139,26 @@ namespace DeenGames.DeepGeo.Core.Maps
             return toReturn;
         }
 
+        public void Remove(Entity e)
+        {
+            this.entities.Remove(e);
+        }
+
+        public void FlipSwitches()
+        {
+            var doors = this.entities.Where(s => s is SwitchDoor).Select(s => s as SwitchDoor);
+            foreach (var d in doors)
+            {
+                d.IsOpen = !d.IsOpen;
+            }
+        }
+
+
+        private bool IsWall(int x, int y)
+        {
+            return !IsWalkable(x, y) && !this.entities.Any(e => e.X == x && e.Y == y && e.IsSolid == true);
+        }
+
         private void GeneratePushPuzzle()
         {
             // Generate a bunch of stuff you have to push into place in a pattern
@@ -184,6 +209,40 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
+        private void GenerateSwitchPuzzle()
+        {
+            int doorsToGenerate = Config.Instance.Get<int>("SwitchDoors");
+            int generated = 0;
+
+            var doorColours = new ColourTuple[] { new ColourTuple(0, 255, 0), new ColourTuple(128, 0, 255) };
+
+            while (generated < doorsToGenerate)
+            {
+                var spot = this.FindEmptyPosition();
+                if (this.IsInHallway(spot.X, spot.Y))
+                {
+                    var door = new SwitchDoor(generated % 2 == 0 ? doorColours[0] : doorColours[1]);
+                    if (door.Colour == doorColours[1])
+                    {
+                        door.IsOpen = true;
+                    }
+                    door.Move(spot.X, spot.Y);
+                    this.entities.Add(door);
+                    generated++;
+                }
+            }
+
+            for (var i = 0; i < Config.Instance.Get<int>("Switches"); i++)
+            {
+                var spot = this.FindEmptyPosition();
+                var s = new Switch(doorColours);
+                s.Move(spot.X, spot.Y);
+                this.entities.Add(s);
+            }
+        }
+
+
+
         private Point FindEmptyPosition()
         {
             // Position the player somewhere on a walkable square
@@ -199,14 +258,8 @@ namespace DeenGames.DeepGeo.Core.Maps
             return new Point(x, y);
         }
 
-        public void Remove(Entity e)
-        {
-            this.entities.Remove(e);
-        }
-
         private void GenerateLockedDoorsAndKeys()
         {
-            int iterations = 0;
             int numToGenerate = Config.Instance.Get<int>("NumberLockedDoors");
             int generated = 0;
             int radiusUsed = 4;
@@ -214,24 +267,16 @@ namespace DeenGames.DeepGeo.Core.Maps
 
             while (generated < numToGenerate)
             {
-                iterations++;
-
                 if (!nearStairs.Any())
                 {
-                    nearStairs = this.tileData.GetCellsInArea(this.stairsDown.X, this.stairsDown.Y, radiusUsed).OrderBy(r => random.Next(1000)).ToList();
+                    nearStairs = this.tileData.GetCellsInArea(this.stairsDown.X, this.stairsDown.Y, radiusUsed).OrderBy(r => random.Next(100)).ToList();
                     radiusUsed *= 2;
                 }
 
                 var spot = nearStairs.First();
                 nearStairs.Remove(spot);
 
-                // Try to find spots near the stairs
-                var left = this.IsWalkable(spot.X - 1, spot.Y);
-                var right = this.IsWalkable(spot.X + 1, spot.Y);
-                var up = this.IsWalkable(spot.X, spot.Y - 1);
-                var down = this.IsWalkable(spot.X, spot.Y + 1);
-
-                if ((!left && !right && up && down) || (left && right && !up && !down))
+                if (this.IsInHallway(spot.X, spot.Y))
                 {
                     var door = new LockedDoor();
                     door.Move(spot.X, spot.Y);
@@ -253,6 +298,17 @@ namespace DeenGames.DeepGeo.Core.Maps
                 this.entities.Add(key);
                 generated++;
             }
+        }
+
+        private bool IsInHallway(int x, int y)
+        {
+            // Try to find spots near the stairs
+            var left = this.IsWall(x - 1, y);
+            var right = this.IsWall(x + 1, y);
+            var up = this.IsWall(x, y - 1);
+            var down = this.IsWall(x, y + 1);
+
+            return ((!left && !right && up && down) || (left && right && !up && !down));
         }
     }
 }
