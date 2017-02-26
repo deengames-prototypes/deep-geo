@@ -245,11 +245,10 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         private Point FindEmptyPosition()
         {
-            // Position the player somewhere on a walkable square
             int x = this.random.Next(1, this.width - 1);
             int y = this.random.Next(1, this.height - 1);
 
-            while (!(tileData.IsWalkable(x, y)) || (stairsDown.X == x && stairsDown.Y == y))
+            while (!(tileData.IsWalkable(x, y)) || this.entities.Any(e => e.X == x && e.Y == y))
             {
                 x = this.random.Next(this.width);
                 y = this.random.Next(this.height);
