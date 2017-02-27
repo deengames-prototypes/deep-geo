@@ -1,5 +1,6 @@
 ﻿using DeenGames.DeepGeo.Core.Entities;
 using DeenGames.DeepGeo.Core.IO;
+using Newtonsoft.Json.Linq;
 using RogueSharp;
 using RogueSharp.Random;
 using System;
@@ -60,6 +61,8 @@ namespace DeenGames.DeepGeo.Core.Maps
             {
                 this.GenerateSwitchPuzzle();
             }
+
+            this.GenerateMonsters();
         }
 
         public bool IsWalkable(int x, int y)
@@ -214,7 +217,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             int doorsToGenerate = Config.Instance.Get<int>("SwitchDoors");
             int generated = 0;
 
-            var doorColours = new ColourTuple[] { new ColourTuple(0, 255, 0), new ColourTuple(128, 0, 255) };
+            var doorColours = new ColourTuple[] { ColourTuple.Cyan, ColourTuple.Purple };
 
             while (generated < doorsToGenerate)
             {
@@ -241,7 +244,25 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
+        private void GenerateMonsters()
+        {
+            var num = Config.Instance.Get<int>("NumMonsters");
 
+            JArray templates = Config.Instance.Get<dynamic>("Monsters");
+            var monsterColours = new ColourTuple[] { ColourTuple.Orange, ColourTuple.Green };
+
+            for (var i = 0; i < num; i++)
+            {
+                var t = templates[i % templates.Count];
+                var colour = monsterColours[i % templates.Count];
+                var speed = (int)t["Speed"];
+                var vision = t["Vision"].ToString();
+                var visionSize = (int)t["VisionSize"];
+                var spot = this.FindEmptyPosition();
+
+                this.entities.Add(new Monster(colour, speed, vision, visionSize).Move(spot));
+            }
+        }
 
         private Point FindEmptyPosition()
         {

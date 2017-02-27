@@ -155,7 +155,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
                         foreach (var w in switches)
                         {
-                            w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.Red, s.Data.Colour.Green, s.Data.Colour.Blue);
+                            w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.R, s.Data.Colour.G, s.Data.Colour.B);
                         }
 
                         showMessageCallback("You flip the switch.");
@@ -409,7 +409,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             var toReturn = new GameObjectWithData(Engine.DefaultFont, data);
             toReturn.Name = name;
-            toReturn.DrawAs(data.DisplayCharacter, new Color(data.Colour.Red, data.Colour.Green, data.Colour.Blue));
+            toReturn.DrawAs(data.DisplayCharacter, new Color(data.Colour.R, data.Colour.G, data.Colour.B));
             toReturn.IsVisible = false;
             toReturn.Position = new Point(data.X, data.Y);
             this.objects.Add(toReturn);

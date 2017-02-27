@@ -11,7 +11,7 @@ namespace DeenGames.DeepGeo.Core.Entities
     {
         public int Keys { get; set; } = 0;
 
-        public Player() : base('@', new ColourTuple(255, 128, 0), true)
+        public Player() : base('@', ColourTuple.Orange, true)
         {
         }
     }

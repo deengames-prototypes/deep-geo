@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Affordances.cs" />
+    <Compile Include="Entities\Monster.cs" />
     <Compile Include="Entities\Switch.cs" />
     <Compile Include="Entities\SwitchDoor.cs" />
     <Compile Include="Entities\LockedDoor.cs" />

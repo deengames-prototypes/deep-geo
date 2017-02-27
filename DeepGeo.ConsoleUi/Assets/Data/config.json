@@ -2,11 +2,19 @@
     "PlayerLightRadius": 100,
     "MapWidth": 80,
     "MapHeight": 22,
+
     "PushPuzzleProbability": 100,
     "PushPuzzleBlocks": 6,
-    "NumberLockedDoors": 10,
     "KeysForBlockPuzzle": 3,
-    "SwitchPuzzleProbability":  100,
+
+    "NumberLockedDoors": 10,
+    "SwitchPuzzleProbability": 100,
     "Switches": 2,
-    "SwitchDoors": 10
+    "SwitchDoors": 10,
+
+    "NumMonsters":  10,
+    "Monsters": [
+        { "Speed": 3, "Vision": "Cone", "VisionSize": 3 },
+        { "Speed": 1, "Vision": "Circle", "VisionSize": 5 }        
+    ]
 }
