@@ -170,8 +170,8 @@ namespace DeenGames.DeepGeo.Core.Maps
             // Simple: generate blocks of alternating colours in a line.
             // Player has to reassemble them in a grid.
 
-            var red = new ColourTuple(255, 0, 0);
-            var blue = new ColourTuple(0, 0, 255);
+            var red = ColourTuple.Red;
+            var blue = ColourTuple.Blue;
 
             for (var i = 0; i < Config.Instance.Get<int>("PushPuzzleBlocks"); i++)
             {
@@ -214,6 +214,10 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         private void GenerateSwitchPuzzle()
         {
+            // Generate a puzzle with N switches, each of which toggles one set of alternating doors.
+            // Eg. half the doors are blue, and half are purple; switches toggle between the two,
+            // eg. blue open purple closed, purple open blue closed.
+
             int doorsToGenerate = Config.Instance.Get<int>("SwitchDoors");
             int generated = 0;
 
@@ -280,6 +284,9 @@ namespace DeenGames.DeepGeo.Core.Maps
 
         private void GenerateLockedDoorsAndKeys()
         {
+            // Generate a bunch of locked doors, and about half as many keys.
+            // Locked doors tend to appear near the stairs down.
+
             int numToGenerate = Config.Instance.Get<int>("NumberLockedDoors");
             int generated = 0;
             int radiusUsed = 4;

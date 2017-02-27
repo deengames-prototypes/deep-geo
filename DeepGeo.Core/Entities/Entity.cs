@@ -37,6 +37,8 @@ namespace DeenGames.DeepGeo.Core.Entities
 
     public class ColourTuple
     {
+        public static readonly ColourTuple Red = new ColourTuple(255, 0, 0);
+        public static readonly ColourTuple Blue = new ColourTuple(0, 0, 255);
         public static readonly ColourTuple Orange = new ColourTuple(255, 128, 0);
         public static readonly ColourTuple Green = new ColourTuple(0, 255, 0);
         public static readonly ColourTuple Purple = new ColourTuple(128, 0, 255);
