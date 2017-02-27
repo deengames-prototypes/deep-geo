@@ -62,7 +62,7 @@ namespace DeenGames.DeepGeo.Core.Maps
                 this.GenerateSwitchPuzzle();
             }
 
-            this.GenerateMonsters();
+            this.GenerateMonsters();            
         }
 
         public bool IsWalkable(int x, int y)
@@ -156,6 +156,19 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
         }
 
+        internal Point FindEmptyPosition()
+        {
+            int x = this.random.Next(1, this.width - 1);
+            int y = this.random.Next(1, this.height - 1);
+
+            while (!(tileData.IsWalkable(x, y)) || this.entities.Any(e => e.X == x && e.Y == y))
+            {
+                x = this.random.Next(this.width);
+                y = this.random.Next(this.height);
+            }
+
+            return new Point(x, y);
+        }
 
         private bool IsWall(int x, int y)
         {
@@ -264,22 +277,12 @@ namespace DeenGames.DeepGeo.Core.Maps
                 var visionSize = (int)t["VisionSize"];
                 var spot = this.FindEmptyPosition();
 
-                this.entities.Add(new Monster(colour, speed, vision, visionSize).Move(spot));
+                var m = new Monster(colour, speed, vision, visionSize, this);
+                m.Move(spot);
+                m.PickRandomTarget();
+
+                this.entities.Add(m);
             }
-        }
-
-        private Point FindEmptyPosition()
-        {
-            int x = this.random.Next(1, this.width - 1);
-            int y = this.random.Next(1, this.height - 1);
-
-            while (!(tileData.IsWalkable(x, y)) || this.entities.Any(e => e.X == x && e.Y == y))
-            {
-                x = this.random.Next(this.width);
-                y = this.random.Next(this.height);
-            }
-
-            return new Point(x, y);
         }
 
         private void GenerateLockedDoorsAndKeys()

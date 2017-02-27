@@ -252,6 +252,14 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
             fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
+
+            // Monsters turn
+            foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
+            {
+                var data = monsterView.Data as Monster;
+                data.MoveTowardsGoal();
+                monsterView.Position = new Point(data.X, data.Y);
+            }
         }
 
         private void CheckIfBlockPuzzleIsComplete()
