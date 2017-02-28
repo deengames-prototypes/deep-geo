@@ -299,7 +299,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             int numToGenerate = Config.Instance.Get<int>("NumberLockedDoors");
             int generated = 0;
             int radiusUsed = 4;
-            var nearStairs = new List<Cell>();
+            var nearStairs = new List<ICell>();
 
             while (generated < numToGenerate)
             {

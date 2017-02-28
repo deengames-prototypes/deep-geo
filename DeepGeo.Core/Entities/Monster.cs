@@ -24,42 +24,35 @@ namespace DeenGames.DeepGeo.Core.Entities
             this.VisionType = visionType;
             this.VisionSize = VisionSize;
             Monster.map = map;
+            this.goal = map.FindEmptyPosition();
         }
 
         // TODO: do this every frame. Why? Stuff moves. Player moves, barrels move,
         // doors lock and unlock, stuff happens. Can't just go with a static path.
         public void MoveTowardsGoal()
         {
-            if (this.goal == null || (this.X == this.goal.X && this.Y == this.goal.Y))
+            if (this.X == this.goal.X && this.Y == this.goal.Y)
             {
                 this.goal = map.FindEmptyPosition();
             }
 
             GoalMap goalMap = this.CreateGoalMap();
 
-            // Sadly, there is no way to do this without try/catch. The performance sucks.
-            // TODO: open a PR. I need a goalMap.IsPath(x, y) returns true/false
-            // Or, like, goalMap.TryFindPath(..., out path).
-            Path path = null;
-
-            while (path == null)
+            var paths = goalMap.HasPath(this.X, this.Y);
+            if (paths.Any())
             {
-                try
+                var path = paths.First();
+                var now = path.Steps.First();
+                var nextStep = path.Steps.Skip(1).FirstOrDefault();
+                if (nextStep != null && map.IsWalkable(nextStep.X, nextStep.Y))
                 {
-                    path = goalMap.FindPath(this.X, this.Y);
-                }
-                catch
-                {
-                    this.goal = map.FindEmptyPosition();
-                    goalMap = this.CreateGoalMap();
+                    this.Move(nextStep.X, nextStep.Y);
                 }
             }
-
-            var now = path.Steps.First();
-            var nextStep = path.Steps.Skip(1).FirstOrDefault();
-            if (nextStep != null && map.IsWalkable(nextStep.X, nextStep.Y))
+            else
             {
-                this.Move(nextStep.X, nextStep.Y);
+                // Set goal to current position so that it recycles next tick
+                this.goal = new Point(this.X, this.Y);
             }
         }
 
