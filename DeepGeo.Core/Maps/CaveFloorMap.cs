@@ -279,8 +279,6 @@ namespace DeenGames.DeepGeo.Core.Maps
 
                 var m = new Monster(colour, speed, vision, visionSize, this);
                 m.Move(spot);
-                m.PickRandomTarget();
-
                 this.entities.Add(m);
             }
         }

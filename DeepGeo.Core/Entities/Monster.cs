@@ -26,15 +26,15 @@ namespace DeenGames.DeepGeo.Core.Entities
             Monster.map = map;
         }
 
-        public void PickRandomTarget()
-        {
-            this.goal = map.FindEmptyPosition();
-        }
-
         // TODO: do this every frame. Why? Stuff moves. Player moves, barrels move,
         // doors lock and unlock, stuff happens. Can't just go with a static path.
         public void MoveTowardsGoal()
         {
+            if (this.goal == null || (this.X == this.goal.X && this.Y == this.goal.Y))
+            {
+                this.goal = map.FindEmptyPosition();
+            }
+
             var goalMap = new GoalMap(map.GetIMap());
             // Aim for our random goal
             goalMap.AddGoal(this.goal.X, this.goal.Y, 100);
@@ -50,7 +50,9 @@ namespace DeenGames.DeepGeo.Core.Entities
             try
             {
                 var path = goalMap.FindPath(this.X, this.Y);
+                var now = path.Steps.First();
                 var nextStep = path.Steps.Skip(1).First();
+                // TODO: check if this spot is empty
                 this.Move(nextStep.X, nextStep.Y);
             }
             catch (Exception e)
