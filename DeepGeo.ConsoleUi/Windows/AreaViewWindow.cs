@@ -169,13 +169,13 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private void MovePlayerBy(Point amount, KeyboardInfo info = null)
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
-            var playerEntity = this.objects.Single(g => g.Name == "Player");
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
+            var playerView = this.objects.Single(g => g.Name == "Player");
+            var fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
             
             // Get the position the player will be at
-            Point newPosition = playerEntity.Position + amount;
+            Point newPosition = playerView.Position + amount;
             
             // Is there a block there?
             if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
@@ -203,23 +203,24 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     // If so, and if the target block position is walkable, pull it along. But this only works if you're pulling
                     // in the direction you're moving (eg. standing on top and pulling a block upward), NOT standing beside a block
                     // and pulling it upward or standing above a block and pulling to the left/right
-                    var currentBlockPos = playerEntity.Position + new Point(amount.X * -1, amount.Y * -1);
+                    var currentBlockPos = playerView.Position + new Point(amount.X * -1, amount.Y * -1);
                     if (currentMap.GetObjectsAt(currentBlockPos.X, currentBlockPos.Y).Any(e => e is Pullable))
                     {
                         // Given constraints above, target position is current player position
                         var obj = currentMap.GetObjectsAt(currentBlockPos.X, currentBlockPos.Y).Single(e => e is Pullable);
-                        obj.Move(playerEntity.Position.X, playerEntity.Position.Y);
-                        this.objects.Single(g => g.Data == obj).Move(playerEntity.Position.X, playerEntity.Position.Y);
+                        obj.Move(playerView.Position.X, playerView.Position.Y);
+                        this.objects.Single(g => g.Data == obj).Move(playerView.Position.X, playerView.Position.Y);
                         this.CheckIfBlockPuzzleIsComplete();
                     }
                 }
 
                 // Move the player
-                playerEntity.Position += amount;
+                playerView.Position += amount;
+                playerView.Data.Move(playerView.Position.X, playerView.Position.Y);
                 CenterViewToPlayer();
             }
 
-            var key = this.currentMap.GetObjectsAt(playerEntity.Position.X, playerEntity.Position.Y).Where(s => s is Key).SingleOrDefault();
+            var key = this.currentMap.GetObjectsAt(playerView.Position.X, playerView.Position.Y).Where(s => s is Key).SingleOrDefault();
             if (key != null)
             {
                 // Not sure why two keys are spawned here
@@ -235,7 +236,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
 
             // Door there, and we have a key? Unlock it!
-            if ((playerEntity.Data as Player).Keys > 0 && this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(o => o is LockedDoor))
+            if ((playerView.Data as Player).Keys > 0 && this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(o => o is LockedDoor))
             {
                 var doorData = this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Where(o => o is LockedDoor).ToList();
                 var doors = this.objects.Where(o => doorData.Contains(o.Data)).ToList();
@@ -247,10 +248,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     this.currentMap.Remove(door.Data);
                 }
                 showMessageCallback("You unlock the door.");
-                (playerEntity.Data as Player).Keys -= 1;
+                (playerView.Data as Player).Keys -= 1;
             }
 
-            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
+            fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
 
             // Monsters turn
@@ -338,7 +339,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private void GenerateAndDisplayMap()
         {
-            var playerEntity = this.objects.Single(g => g.Name == "Player");
+            var playerView = this.objects.Single(g => g.Name == "Player");
             var mapWidth = Config.Instance.Get<int>("MapWidth");
             var mapHeight = Config.Instance.Get<int>("MapHeight");
 
@@ -346,8 +347,8 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             this.currentMap = new CaveFloorMap(mapWidth, mapHeight);
 
             // Create the view
-            var start = currentMap.PlayerStartPosition;
-            playerEntity.Position = new Point(start.X, start.Y);
+            var start = currentMap.AddPlayer(playerView.Data as Player);
+            playerView.Position = new Point(start.X, start.Y);
             this.CenterViewToPlayer();
 
             var stairsDown = this.objects.Single(g => g.Name == "StairsDown");
@@ -355,7 +356,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
             foreach (var obj in currentMap.Objects)
             {
-                this.CreateGameObject(string.Empty, obj);
+                if (!this.objects.Any(o => o.Data == obj))
+                {
+                    this.CreateGameObject(string.Empty, obj);
+                }
             }
 
             // Loop through the map information generated by RogueSharp and update our view

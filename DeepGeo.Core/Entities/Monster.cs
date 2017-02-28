@@ -35,6 +35,36 @@ namespace DeenGames.DeepGeo.Core.Entities
                 this.goal = map.FindEmptyPosition();
             }
 
+            GoalMap goalMap = this.CreateGoalMap();
+
+            // Sadly, there is no way to do this without try/catch. The performance sucks.
+            // TODO: open a PR. I need a goalMap.IsPath(x, y) returns true/false
+            // Or, like, goalMap.TryFindPath(..., out path).
+            Path path = null;
+
+            while (path == null)
+            {
+                try
+                {
+                    path = goalMap.FindPath(this.X, this.Y);
+                }
+                catch
+                {
+                    this.goal = map.FindEmptyPosition();
+                    goalMap = this.CreateGoalMap();
+                }
+            }
+
+            var now = path.Steps.First();
+            var nextStep = path.Steps.Skip(1).FirstOrDefault();
+            if (nextStep != null && map.IsWalkable(nextStep.X, nextStep.Y))
+            {
+                this.Move(nextStep.X, nextStep.Y);
+            }
+        }
+
+        private GoalMap CreateGoalMap()
+        {
             var goalMap = new GoalMap(map.GetIMap());
             // Aim for our random goal
             goalMap.AddGoal(this.goal.X, this.goal.Y, 100);
@@ -47,18 +77,7 @@ namespace DeenGames.DeepGeo.Core.Entities
                 }
             }
 
-            try
-            {
-                var path = goalMap.FindPath(this.X, this.Y);
-                var now = path.Steps.First();
-                var nextStep = path.Steps.Skip(1).First();
-                // TODO: check if this spot is empty
-                this.Move(nextStep.X, nextStep.Y);
-            }
-            catch (Exception e)
-            {
-                // TODO: pick a different goal? meander around aimlessly?
-            }
+            return goalMap;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace DeenGames.DeepGeo.Core.Maps
 {
     public class CaveFloorMap
     {
-        public Point PlayerStartPosition { get; private set; }
+        public Point playerStartPosition;
 
         private RogueSharp.Map tileData;
 
@@ -38,14 +38,14 @@ namespace DeenGames.DeepGeo.Core.Maps
             this.stairsDown = new Entities.Stairs();
             this.stairsDown.Move(this.FindEmptyPosition());
 
-            this.PlayerStartPosition = this.FindEmptyPosition();
+            this.playerStartPosition = this.FindEmptyPosition();
             var distanceSquared = Math.Pow(Math.Min(this.width, this.height), 2);
             int tries = 0;
 
             // Approximate distance must be the width of the map or more. Try it 100 times, then quit.
-            while (tries <= 100 && Math.Pow(this.PlayerStartPosition.X - this.stairsDown.X, 2) + Math.Pow(this.PlayerStartPosition.Y - this.stairsDown.Y, 2) <= distanceSquared)
+            while (tries <= 100 && Math.Pow(this.playerStartPosition.X - this.stairsDown.X, 2) + Math.Pow(this.playerStartPosition.Y - this.stairsDown.Y, 2) <= distanceSquared)
             {
-                this.PlayerStartPosition = this.FindEmptyPosition();
+                this.playerStartPosition = this.FindEmptyPosition();
                 distanceSquared = Math.Pow(Math.Min(this.width, this.height), 2);
                 tries += 1;
             }
@@ -63,6 +63,14 @@ namespace DeenGames.DeepGeo.Core.Maps
             }
 
             this.GenerateMonsters();            
+        }
+
+        // Adds the player to objects, returns their coordinates
+        public Point AddPlayer(Player player)
+        {
+            this.entities.Add(player);
+            player.Move(this.playerStartPosition);
+            return this.playerStartPosition;
         }
 
         public bool IsWalkable(int x, int y)
