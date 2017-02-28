@@ -17,6 +17,7 @@ namespace DeenGames.DeepGeo.Core.Entities
         private static CaveFloorMap map; // there's only one map at a time
         private static Random random = new Random();
         private Point goal;
+        private IGoalMap goalMap;
 
         public Monster(ColourTuple colour, int speed, string visionType, int visionSize, CaveFloorMap map) : base('m', colour, true)
         {
@@ -25,35 +26,42 @@ namespace DeenGames.DeepGeo.Core.Entities
             this.VisionSize = VisionSize;
             Monster.map = map;
             this.goal = map.FindEmptyPosition();
+            this.goalMap = this.CreateGoalMap();
         }
 
-        // TODO: do this every frame. Why? Stuff moves. Player moves, barrels move,
-        // doors lock and unlock, stuff happens. Can't just go with a static path.
+        // We pick a goal, and move towards it, no matter what. Doing this every frame
+        // is really expensive and massively slows down the game. We can't have that.
+        // Instead, change your goal only when you're stuck -- path is blocked.
         public void MoveTowardsGoal()
         {
             if (this.X == this.goal.X && this.Y == this.goal.Y)
             {
                 this.goal = map.FindEmptyPosition();
+                this.goalMap = this.CreateGoalMap();
             }
 
-            GoalMap goalMap = this.CreateGoalMap();
-
-            var paths = goalMap.HasPath(this.X, this.Y);
-            if (paths.Any())
+            try
             {
-                var path = paths.First();
+                var path = goalMap.FindPath(this.X, this.Y);
                 var now = path.Steps.First();
                 var nextStep = path.Steps.Skip(1).FirstOrDefault();
                 if (nextStep != null && map.IsWalkable(nextStep.X, nextStep.Y))
                 {
                     this.Move(nextStep.X, nextStep.Y);
                 }
+                else
+                {
+                    // Pick a new goal next time
+                    this.goal = new Point(this.X, this.Y);
+                }
             }
-            else
+            catch (PathNotFoundException p)
             {
-                // Set goal to current position so that it recycles next tick
+                // Can't do anything useful with this exception.
+                // Pick a new goal next time
                 this.goal = new Point(this.X, this.Y);
             }
+
         }
 
         private GoalMap CreateGoalMap()
