@@ -1,0 +1,3 @@
+[submodule "roguesharp"]
+	path = roguesharp
+	url = https://ashes999@bitbucket.org/ashes999/roguesharp.git
