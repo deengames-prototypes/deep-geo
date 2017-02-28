@@ -282,7 +282,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
         }
 
-        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
+        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
@@ -300,7 +300,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         }
 
         // Marks tiles as "discovered" (50% visible). This is the same as "unmarking" visible tiles as visible.
-        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
+        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {

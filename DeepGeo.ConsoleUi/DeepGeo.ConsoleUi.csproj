@@ -59,6 +59,10 @@
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RogueSharp, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RogueSharp.3.0.0\lib\portable-net40+sl50+win+wpa81+wp80\RogueSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SadConsole.Core.OpenGL, Version=5.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\SadConsole.Core.MonoGameGL.5.2.2\lib\net45\SadConsole.Core.OpenGL.dll</HintPath>
       <Private>True</Private>
@@ -104,10 +108,6 @@
     <ProjectReference Include="..\DeepGeo.Core\DeepGeo.Core.csproj">
       <Project>{c24bc693-7df4-41a8-99a2-b8d67dc47986}</Project>
       <Name>DeepGeo.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\roguesharp\RogueSharp\RogueSharp.csproj">
-      <Project>{ebca7ea9-1c80-481a-8025-a465d6ba5f71}</Project>
-      <Name>RogueSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

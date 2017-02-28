@@ -274,7 +274,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             var num = Config.Instance.Get<int>("NumMonsters");
 
             JArray templates = Config.Instance.Get<dynamic>("Monsters");
-            var monsterColours = new ColourTuple[] { ColourTuple.Orange, ColourTuple.Green };
+            var monsterColours = new ColourTuple[] { ColourTuple.Brown, ColourTuple.Green };
 
             for (var i = 0; i < num; i++)
             {
@@ -299,7 +299,7 @@ namespace DeenGames.DeepGeo.Core.Maps
             int numToGenerate = Config.Instance.Get<int>("NumberLockedDoors");
             int generated = 0;
             int radiusUsed = 4;
-            var nearStairs = new List<ICell>();
+            var nearStairs = new List<Cell>();
 
             while (generated < numToGenerate)
             {

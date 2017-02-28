@@ -39,10 +39,11 @@ namespace DeenGames.DeepGeo.Core.Entities
     {
         public static readonly ColourTuple Red = new ColourTuple(255, 0, 0);
         public static readonly ColourTuple Blue = new ColourTuple(0, 0, 255);
-        public static readonly ColourTuple Orange = new ColourTuple(255, 128, 0);
-        public static readonly ColourTuple Green = new ColourTuple(0, 255, 0);
-        public static readonly ColourTuple Purple = new ColourTuple(128, 0, 255);
+        public static readonly ColourTuple Brown = new ColourTuple(128, 64, 0);
         public static readonly ColourTuple Cyan = new ColourTuple(0, 128, 255);
+        public static readonly ColourTuple Green = new ColourTuple(0, 255, 0);
+        public static readonly ColourTuple Orange = new ColourTuple(255, 128, 0);
+        public static readonly ColourTuple Purple = new ColourTuple(128, 0, 255);
 
         public int R { get; set; }
         public int G { get; set; }
