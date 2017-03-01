@@ -173,6 +173,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             var fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
 
             this.MarkCurrentFovAsDiscovered(fovTiles);
+            foreach (var obj in this.objects)
+            {
+                obj.IsVisible = false;
+            }
             
             // Get the position the player will be at
             Point newPosition = playerView.Position + amount;
@@ -310,14 +314,6 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 // Update view rendering to the appropriate effect
                 var tile = this[cell.X, cell.Y];
                 tile.ApplyEffect(DiscoveredEffect);
-
-                foreach (var obj in this.objects)
-                {
-                    if (obj.Position.X == cell.X && obj.Position.Y == cell.Y)
-                    {
-                        obj.IsVisible = false;
-                    }
-                }
             }
         }
 
