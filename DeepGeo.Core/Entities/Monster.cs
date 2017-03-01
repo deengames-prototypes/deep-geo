@@ -23,7 +23,7 @@ namespace DeenGames.DeepGeo.Core.Entities
         {
             this.Speed = speed;
             this.VisionType = visionType;
-            this.VisionSize = VisionSize;
+            this.VisionSize = visionSize;
             Monster.map = map;
             this.goal = map.FindEmptyPosition();
             this.goalMap = this.CreateGoalMap();

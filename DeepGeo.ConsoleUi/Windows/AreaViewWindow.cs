@@ -25,6 +25,12 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
+        private ICellEffect MonsterVisionEffect = new Recolor() { DoForeground = false, DoBackground = true, Background = Color.White * 0.5f, CloneOnApply = false };
+
+        // This is hideous, but necessary. We mark tiles as discovered when discovered; when a monster moves over them,
+        // and then out of sight, how do we know if the tile was discovered or never visible at all? We have to remember.
+        // So, remember. Map of $"{x}, {y}" => cell
+        public Dictionary<string, Cell> discoveredTiles = new Dictionary<string, Cell>();
 
         private Action<string> showMessageCallback;
 
@@ -170,14 +176,32 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var playerView = this.objects.Single(g => g.Name == "Player");
-            var fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
 
+            var fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsDiscovered(fovTiles);
             foreach (var obj in this.objects)
             {
                 obj.IsVisible = false;
             }
-            
+
+            // Undo monster vision tile effect
+            foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
+            {
+                var data = monsterView.Data as Monster;
+                var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
+                // If we can see them, they're discovered
+                foreach (var cell in monsterFov)
+                {
+                    if (this.discoveredTiles.ContainsKey($"{cell.X}, {cell.Y}"))
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                    } else
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                    }
+                }
+            }
+
             // Get the position the player will be at
             Point newPosition = playerView.Position + amount;
             
@@ -258,12 +282,32 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
 
-            // Monsters turn
+            // Monsters turn. Also, draw their field-of-view.
             foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
             {
                 var data = monsterView.Data as Monster;
                 data.MoveTowardsGoal();
                 monsterView.Position = new Point(data.X, data.Y);
+
+                var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
+                foreach (var cell in monsterFov)
+                {
+                    if (fovTiles.Any(f => f.X == data.X && f.Y == data.Y))
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(MonsterVisionEffect);
+                    }
+                    else
+                    {
+                        if (this.discoveredTiles.ContainsKey($"{data.X}, {data.Y}"))
+                        {
+                            this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                        }
+                        else
+                        {
+                            this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                        }
+                    }
+                }
             }
         }
 
@@ -300,23 +344,22 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                         obj.IsVisible = true;
                     }
                 }
+
+                this.discoveredTiles[$"{cell.X}, {cell.Y}"] = tile;
             }
         }
 
-        // Marks tiles as "discovered" (50% visible). This is the same as "unmarking" visible tiles as visible.
         private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
                 // Tell the map data (for FOV calculations) that we've discovered this tile
                 this.currentMap.MarkAsDiscovered(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable);
-
-                // Update view rendering to the appropriate effect
                 var tile = this[cell.X, cell.Y];
                 tile.ApplyEffect(DiscoveredEffect);
             }
         }
-
+        
         private void CenterViewToPlayer()
         {
             var playerEntity = this.objects.Single(g => g.Name == "Player");
