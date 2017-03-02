@@ -174,6 +174,9 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private void MovePlayerBy(Point amount, KeyboardInfo info = null)
         {
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
+
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var playerView = this.objects.Single(g => g.Name == "Player");
 
@@ -286,7 +289,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
             {
                 var data = monsterView.Data as Monster;
-                data.MoveTowardsGoal();
+                data.MoveWithAi(playerView.Data as Player);
                 monsterView.Position = new Point(data.X, data.Y);
 
                 var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
@@ -295,6 +298,11 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     if (fovTiles.Any(f => f.X == data.X && f.Y == data.Y))
                     {
                         this[cell.X, cell.Y].ApplyEffect(MonsterVisionEffect);
+                        if (playerView.Position.X == cell.X && playerView.Position.Y == cell.Y)
+                        {
+                            data.HuntPlayer();
+                            monsterView.RenderCells.First().ActualForeground = new Color(255, 0, 0);
+                        }
                     }
                     else
                     {
@@ -309,6 +317,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     }
                 }
             }
+
+            stopwatch.Stop();
+            var elapsed = stopwatch.Elapsed.TotalSeconds;
+            Console.WriteLine($"Moving took {elapsed}s");
         }
 
         private void CheckIfBlockPuzzleIsComplete()

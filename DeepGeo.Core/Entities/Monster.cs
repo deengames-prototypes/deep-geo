@@ -14,8 +14,11 @@ namespace DeenGames.DeepGeo.Core.Entities
         public string VisionType { get; private set; }
         public int VisionSize { get; private set; }
 
+        private MonsterState currentState = MonsterState.Wandering;
+
         private static CaveFloorMap map; // there's only one map at a time
         private static Random random = new Random();
+
         private Point goal;
         private IGoalMap goalMap;
 
@@ -24,6 +27,7 @@ namespace DeenGames.DeepGeo.Core.Entities
             this.Speed = speed;
             this.VisionType = visionType;
             this.VisionSize = visionSize;
+
             Monster.map = map;
             this.goal = map.FindEmptyPosition();
             this.goalMap = this.CreateGoalMap();
@@ -32,7 +36,33 @@ namespace DeenGames.DeepGeo.Core.Entities
         // We pick a goal, and move towards it, no matter what. Doing this every frame
         // is really expensive and massively slows down the game. We can't have that.
         // Instead, change your goal only when you're stuck -- path is blocked.
-        public void MoveTowardsGoal()
+        public void MoveWithAi(Player player)
+        {
+            switch (this.currentState)
+            {
+                case MonsterState.Wandering:
+                    this.MoveTowardsGoal();
+                    break;
+                case MonsterState.Hunting:
+                    // RogueSharp doesn't allow you to find a goal to a solid spot (what the ...?)
+                    // Instead, find an empty space around the player. If one exists. SRSlyyyyyy?!
+                    // As a side-effect, if the player is in a coordior, and we pick a space on the
+                    // OPPOSITE side of him (i.e. not reachable except through him), we get "no path
+                    // found" and end up running away.
+                    var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).Where(c => c.IsWalkable && (c.X != player.X || c.Y != player.Y)).FirstOrDefault();
+                    if (target != null)
+                    {
+                        this.goal = new Point(target.X, target.Y);
+                        this.goalMap = this.CreateGoalMap();
+                    }
+                    this.MoveTowardsGoal();
+                    break;
+                default:
+                    throw new InvalidOperationException($"Not sure how to deal with state {this.currentState}");
+            }
+        }
+
+        private void MoveTowardsGoal()
         {
             if (this.X == this.goal.X && this.Y == this.goal.Y)
             {
@@ -61,7 +91,6 @@ namespace DeenGames.DeepGeo.Core.Entities
                 // Pick a new goal next time
                 this.goal = new Point(this.X, this.Y);
             }
-
         }
 
         private GoalMap CreateGoalMap()
@@ -80,5 +109,17 @@ namespace DeenGames.DeepGeo.Core.Entities
 
             return goalMap;
         }
+
+        public void HuntPlayer()
+        {
+            this.currentState = MonsterState.Hunting;
+        }
+    }
+
+    public enum MonsterState
+    {
+        Wandering,
+        Hunting, // Actively targetting the player
+        Scouting // Previously saw the player and now hanging around those areas looking for him
     }
 }
