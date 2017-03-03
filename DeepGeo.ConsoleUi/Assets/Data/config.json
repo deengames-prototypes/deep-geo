@@ -14,7 +14,7 @@
 
     "NumMonsters":  10,
     "Monsters": [
-        { "Speed": 3, "Vision": "Cone", "VisionSize": 2 },
-        { "Speed": 1, "Vision": "Circle", "VisionSize": 4 }        
+        { "Speed": 3, "Vision": "Cone", "VisionSize": 3 },
+        { "Speed": 1, "Vision": "Circle", "VisionSize": 3 }        
     ]
 }
