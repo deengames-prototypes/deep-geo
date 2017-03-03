@@ -342,7 +342,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
         }
 
-        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
+        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
@@ -361,7 +361,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
         }
 
-        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
+        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
