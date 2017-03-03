@@ -44,7 +44,6 @@ namespace DeenGames.DeepGeo.Core.Entities
                     this.MoveTowardsGoal();
                     break;
                 case MonsterState.Hunting:
-                    // RogueSharp doesn't allow you to find a goal to a solid spot (what the ...?)
                     // Instead, find an empty space around the player. If one exists. SRSlyyyyyy?!
                     // As a side-effect, if the player is in a coordior, and we pick a space on the
                     // OPPOSITE side of him (i.e. not reachable except through him), we get "no path
@@ -70,9 +69,9 @@ namespace DeenGames.DeepGeo.Core.Entities
                 this.goalMap = this.CreateGoalMap();
             }
 
-            try
+            var path = goalMap.FindPath(this.X, this.Y);
+            if (path != null)
             {
-                var path = goalMap.FindPath(this.X, this.Y);
                 var now = path.Steps.First();
                 var nextStep = path.Steps.Skip(1).FirstOrDefault();
                 if (nextStep != null && map.IsWalkable(nextStep.X, nextStep.Y))
@@ -84,12 +83,9 @@ namespace DeenGames.DeepGeo.Core.Entities
                     // Pick a new goal next time
                     this.goal = new Point(this.X, this.Y);
                 }
-            }
-            catch (PathNotFoundException p)
+            } else
             {
-                // Can't do anything useful with this exception.
-                // Pick a new goal next time
-                this.goal = new Point(this.X, this.Y);
+                // No path to goal...
             }
         }
 
