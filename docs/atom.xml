@@ -3,7 +3,29 @@
         <title>Deep Geo Devlog</title>
         <link href="http://deengames-prototypes.github.io/deep-geo" />
         <id>urn:uuid:83ade4416d08024891d78f55ed986679</id>
-  	    <updated>2017-02-24T00:00:00Z</updated><entry>
+  	    <updated>2017-03-03T00:00:00Z</updated><entry>
+      		<title>Week 2: Switches and Monsters</title>
+          <link href="http://deengames-prototypes.github.io/deep-geo/week-2-switches-and-monsters" />
+      		<id>urn:uuid:5783684af19f41ee8b1ba51e2d664b31</id>
+      		<updated>2017-03-03T00:00:00Z</updated>
+      		<summary>Week 2: Switches and Monsters</summary>
+      		<content type="xhtml">
+      			&lt;p&gt;Continuing our theme of interesting non-combat roguelike mechanics, this week, I implemented switch-puzzles, and hunting monsters.&lt;/p&gt;
+&lt;h1&gt;Switch Puzzles&lt;/h1&gt;
+&lt;p&gt;In every dungeon, the player finds a number of locked doors that are colour-coded (eg. either green or purple), and a couple of switches. Flipping the switch toggles between the two, either opening all the green doors (while locking all the purple doors) or opening all the purple doors (while locking all the green doors).&lt;/p&gt;
+&lt;p&gt;&lt;img src="content/images/gifs/week-2-switches.gif" alt="switch puzzle" /&gt;&lt;/p&gt;
+&lt;h1&gt;Monsters&lt;/h1&gt;
+&lt;p&gt;One mechanic I planned to implement early-on is something skin to stealth: monsters see a range around them, and travel from point to point; if they see you, they chase you until they lose sight of you. This week, I added the sight (transparent white squares) and chasing (monsters turn red when they see you).&lt;/p&gt;
+&lt;p&gt;In the GIF below, you can see the brown monster chasing, while the green monster (left side of the screen) continues about its business.&lt;/p&gt;
+&lt;p&gt;&lt;img src="content/images/gifs/week-2-monsters.gif" alt="monsters hunting" /&gt;&lt;/p&gt;
+&lt;p&gt;For next week, I plan to have monsters give up after losing sight of you for a while, and I plan to add some combat-like moves the player can use to evade capture.&lt;/p&gt;
+      		</content>
+      		<author>
+      			<name>ashes999</name>
+      			<email>ashes999@yahoo.com</email>
+      		</author>
+      	</entry>
+      	<entry>
       		<title>Week 1: Prototyping Puzzles</title>
           <link href="http://deengames-prototypes.github.io/deep-geo/week-1-prototyping-puzzles" />
       		<id>urn:uuid:89e3cf227dfc22bca628ff354a3f9b75</id>
