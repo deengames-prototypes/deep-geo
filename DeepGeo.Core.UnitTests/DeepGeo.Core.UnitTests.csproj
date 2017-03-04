@@ -43,10 +43,6 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RogueSharp, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RogueSharp.3.0.0\lib\portable-net40+sl50+win+wpa81+wp80\RogueSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -68,6 +64,10 @@
     <ProjectReference Include="..\DeepGeo.Core\DeepGeo.Core.csproj">
       <Project>{C24BC693-7DF4-41A8-99A2-B8D67DC47986}</Project>
       <Name>DeepGeo.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\roguesharp\RogueSharp\RogueSharp.csproj">
+      <Project>{ebca7ea9-1c80-481a-8025-a465d6ba5f71}</Project>
+      <Name>RogueSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

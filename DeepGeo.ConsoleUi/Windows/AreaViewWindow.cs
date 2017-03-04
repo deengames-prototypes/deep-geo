@@ -25,6 +25,12 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
+        private ICellEffect MonsterVisionEffect = new Recolor() { DoForeground = false, DoBackground = true, Background = Color.White * 0.5f, CloneOnApply = false };
+
+        // This is hideous, but necessary. We mark tiles as discovered when discovered; when a monster moves over them,
+        // and then out of sight, how do we know if the tile was discovered or never visible at all? We have to remember.
+        // So, remember. Map of $"{x}, {y}" => cell
+        public Dictionary<string, Cell> discoveredTiles = new Dictionary<string, Cell>();
 
         private Action<string> showMessageCallback;
 
@@ -56,6 +62,21 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             {
                 if (obj.IsVisible)
                 {
+                    // Special case for switch doors
+                    if (obj.Data is SwitchDoor)
+                    {
+                        var cell = obj.RenderCells[0].ActualForeground;
+
+                        if ((obj.Data as SwitchDoor).IsOpen)
+                        {
+                            obj.RenderCells[0].ActualForeground = new Color(cell.R, cell.G, cell.B, 0.5f); // transparent
+                        }
+                        else
+                        {
+                            obj.RenderCells[0].ActualForeground = new Color(cell.R, cell.G, cell.B, 1f);   // 100% opaque
+                        }
+                    }
+
                     obj.Render();
                 }
             }
@@ -127,22 +148,68 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 this.MovePlayerBy(new Point(-1, 0), info);
             }
 
+            if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Space)))
+            {
+                var switches = this.objects.Where(o => o.Data is Switch);
+                var player = this.objects.Single(o => o.Data is Player);
+                foreach (var s in switches)
+                {
+                    if ((Math.Abs(s.Position.X - player.Position.X) + Math.Abs(s.Position.Y - player.Position.Y)) <= 1)
+                    {
+                        (s.Data as Switch).Flip();
+                        this.currentMap.FlipSwitches();
+
+                        foreach (var w in switches)
+                        {
+                            w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.R, s.Data.Colour.G, s.Data.Colour.B);
+                        }
+
+                        showMessageCallback("You flip the switch.");
+                    }
+                }
+            }
+
             return false;
         }
 
         private void MovePlayerBy(Point amount, KeyboardInfo info = null)
         {
-            var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
-            var playerEntity = this.objects.Single(g => g.Name == "Player");
-            var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
 
+            var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
+            var playerView = this.objects.Single(g => g.Name == "Player");
+
+            var fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsDiscovered(fovTiles);
-            
+            foreach (var obj in this.objects)
+            {
+                obj.IsVisible = false;
+            }
+
+            // Undo monster vision tile effect
+            foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
+            {
+                var data = monsterView.Data as Monster;
+                var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
+                // If we can see them, they're discovered
+                foreach (var cell in monsterFov)
+                {
+                    if (this.discoveredTiles.ContainsKey($"{cell.X}, {cell.Y}"))
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                    } else
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                    }
+                }
+            }
+
             // Get the position the player will be at
-            Point newPosition = playerEntity.Position + amount;
+            Point newPosition = playerView.Position + amount;
             
             // Is there a block there?
-                if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
+            if (currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(e => e is Pushable))
             {
                 // Is there an empty space behind it?
                 var behindBlock = newPosition + amount;
@@ -167,23 +234,24 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     // If so, and if the target block position is walkable, pull it along. But this only works if you're pulling
                     // in the direction you're moving (eg. standing on top and pulling a block upward), NOT standing beside a block
                     // and pulling it upward or standing above a block and pulling to the left/right
-                    var currentBlockPos = playerEntity.Position + new Point(amount.X * -1, amount.Y * -1);
+                    var currentBlockPos = playerView.Position + new Point(amount.X * -1, amount.Y * -1);
                     if (currentMap.GetObjectsAt(currentBlockPos.X, currentBlockPos.Y).Any(e => e is Pullable))
                     {
                         // Given constraints above, target position is current player position
                         var obj = currentMap.GetObjectsAt(currentBlockPos.X, currentBlockPos.Y).Single(e => e is Pullable);
-                        obj.Move(playerEntity.Position.X, playerEntity.Position.Y);
-                        this.objects.Single(g => g.Data == obj).Move(playerEntity.Position.X, playerEntity.Position.Y);
+                        obj.Move(playerView.Position.X, playerView.Position.Y);
+                        this.objects.Single(g => g.Data == obj).Move(playerView.Position.X, playerView.Position.Y);
                         this.CheckIfBlockPuzzleIsComplete();
                     }
                 }
 
                 // Move the player
-                playerEntity.Position += amount;
+                playerView.Position += amount;
+                playerView.Data.Move(playerView.Position.X, playerView.Position.Y);
                 CenterViewToPlayer();
             }
 
-            var key = this.currentMap.GetObjectsAt(playerEntity.Position.X, playerEntity.Position.Y).Where(s => s is Key).SingleOrDefault();
+            var key = this.currentMap.GetObjectsAt(playerView.Position.X, playerView.Position.Y).Where(s => s is Key).SingleOrDefault();
             if (key != null)
             {
                 // Not sure why two keys are spawned here
@@ -199,7 +267,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
 
             // Door there, and we have a key? Unlock it!
-            if ((playerEntity.Data as Player).Keys > 0 && this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(o => o is LockedDoor))
+            if ((playerView.Data as Player).Keys > 0 && this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Any(o => o is LockedDoor))
             {
                 var doorData = this.currentMap.GetObjectsAt(newPosition.X, newPosition.Y).Where(o => o is LockedDoor).ToList();
                 var doors = this.objects.Where(o => doorData.Contains(o.Data)).ToList();
@@ -211,11 +279,48 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                     this.currentMap.Remove(door.Data);
                 }
                 showMessageCallback("You unlock the door.");
-                (playerEntity.Data as Player).Keys -= 1;
+                (playerView.Data as Player).Keys -= 1;
             }
 
-            fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
+            fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
+
+            // Monsters turn. Also, draw their field-of-view.
+            foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
+            {
+                var data = monsterView.Data as Monster;
+                data.MoveWithAi(playerView.Data as Player);
+                monsterView.Position = new Point(data.X, data.Y);
+
+                var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
+                foreach (var cell in monsterFov)
+                {
+                    if (fovTiles.Any(f => f.X == data.X && f.Y == data.Y))
+                    {
+                        this[cell.X, cell.Y].ApplyEffect(MonsterVisionEffect);
+                        if (playerView.Position.X == cell.X && playerView.Position.Y == cell.Y)
+                        {
+                            data.HuntPlayer();
+                            monsterView.RenderCells.First().ActualForeground = new Color(255, 0, 0);
+                        }
+                    }
+                    else
+                    {
+                        if (this.discoveredTiles.ContainsKey($"{data.X}, {data.Y}"))
+                        {
+                            this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                        }
+                        else
+                        {
+                            this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                        }
+                    }
+                }
+            }
+
+            stopwatch.Stop();
+            var elapsed = stopwatch.Elapsed.TotalSeconds;
+            Console.WriteLine($"Moving took {elapsed}s");
         }
 
         private void CheckIfBlockPuzzleIsComplete()
@@ -237,7 +342,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             }
         }
 
-        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
+        private void MarkCurrentFovAsVisible(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
@@ -251,31 +356,22 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                         obj.IsVisible = true;
                     }
                 }
+
+                this.discoveredTiles[$"{cell.X}, {cell.Y}"] = tile;
             }
         }
 
-        // Marks tiles as "discovered" (50% visible). This is the same as "unmarking" visible tiles as visible.
-        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.Cell> fovTiles)
+        private void MarkCurrentFovAsDiscovered(IReadOnlyCollection<RogueSharp.ICell> fovTiles)
         {
             foreach (var cell in fovTiles)
             {
                 // Tell the map data (for FOV calculations) that we've discovered this tile
                 this.currentMap.MarkAsDiscovered(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable);
-
-                // Update view rendering to the appropriate effect
                 var tile = this[cell.X, cell.Y];
                 tile.ApplyEffect(DiscoveredEffect);
-
-                foreach (var obj in this.objects)
-                {
-                    if (obj.Position.X == cell.X && obj.Position.Y == cell.Y)
-                    {
-                        obj.IsVisible = false;
-                    }
-                }
             }
         }
-
+        
         private void CenterViewToPlayer()
         {
             var playerEntity = this.objects.Single(g => g.Name == "Player");
@@ -294,7 +390,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         private void GenerateAndDisplayMap()
         {
-            var playerEntity = this.objects.Single(g => g.Name == "Player");
+            var playerView = this.objects.Single(g => g.Name == "Player");
             var mapWidth = Config.Instance.Get<int>("MapWidth");
             var mapHeight = Config.Instance.Get<int>("MapHeight");
 
@@ -302,8 +398,8 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             this.currentMap = new CaveFloorMap(mapWidth, mapHeight);
 
             // Create the view
-            var start = currentMap.PlayerStartPosition;
-            playerEntity.Position = new Point(start.X, start.Y);
+            var start = currentMap.AddPlayer(playerView.Data as Player);
+            playerView.Position = new Point(start.X, start.Y);
             this.CenterViewToPlayer();
 
             var stairsDown = this.objects.Single(g => g.Name == "StairsDown");
@@ -311,7 +407,10 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
             foreach (var obj in currentMap.Objects)
             {
-                this.CreateGameObject(string.Empty, obj);
+                if (!this.objects.Any(o => o.Data == obj))
+                {
+                    this.CreateGameObject(string.Empty, obj);
+                }
             }
 
             // Loop through the map information generated by RogueSharp and update our view
@@ -373,7 +472,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         {
             var toReturn = new GameObjectWithData(Engine.DefaultFont, data);
             toReturn.Name = name;
-            toReturn.DrawAs(data.DisplayCharacter, new Color(data.Colour.Red, data.Colour.Green, data.Colour.Blue));
+            toReturn.DrawAs(data.DisplayCharacter, new Color(data.Colour.R, data.Colour.G, data.Colour.B));
             toReturn.IsVisible = false;
             toReturn.Position = new Point(data.X, data.Y);
             this.objects.Add(toReturn);

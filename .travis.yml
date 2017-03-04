@@ -5,7 +5,8 @@ install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 mono:
   - latest
-#before_script:
+before_script:
+  git submodule update --recursive
   # setup a virtual display so we can use forms, etc. 
   # - "export DISPLAY=:99.0"
   # - "sh -e /etc/init.d/xvfb start"

@@ -55,7 +55,7 @@ namespace DeenGames.DeepGeo.Core.UnitTests.Maps
         {
             // Stairs are randomly positioned. To avoid a flaky test, just check if the distance is non-zero.
             var floor = new CaveFloorMap(MapWidth, MapHeight);
-            var playerPosition = floor.PlayerStartPosition;
+            var playerPosition = floor.playerStartPosition;
             var stairsDown = floor.StairsDownPosition;
 
             var distance = Math.Abs(playerPosition.X - stairsDown.X) + Math.Abs(playerPosition.Y - stairsDown.Y);
