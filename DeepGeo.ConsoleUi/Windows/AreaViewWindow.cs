@@ -291,6 +291,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 var data = monsterView.Data as Monster;
                 data.MoveWithAi(playerView.Data as Player);
                 monsterView.Position = new Point(data.X, data.Y);
+                bool sawPlayer = false;
 
                 var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
                 foreach (var cell in monsterFov)
@@ -302,6 +303,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                         {
                             data.HuntPlayer();
                             monsterView.RenderCells.First().ActualForeground = new Color(255, 0, 0);
+                            sawPlayer = true;
                         }
                     }
                     else
@@ -315,6 +317,11 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                             this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
                         }
                     }
+                }
+
+                if (!sawPlayer && monsterView.RenderCells.First().ActualForeground.R == 255)
+                {
+                    monsterView.RenderCells.First().ActualForeground = new Color(data.Colour.R, data.Colour.G, data.Colour.B);
                 }
             }
 
