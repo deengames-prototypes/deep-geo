@@ -44,15 +44,28 @@ namespace DeenGames.DeepGeo.Core.Entities
                     this.MoveTowardsGoal();
                     break;
                 case MonsterState.Hunting:
-                    // Instead, find an empty space around the player. If one exists. SRSlyyyyyy?!
-                    // As a side-effect, if the player is in a coordior, and we pick a space on the
-                    // OPPOSITE side of him (i.e. not reachable except through him), we get "no path
-                    // found" and end up running away.
-                    var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).Where(c => c.IsWalkable && (c.X != player.X || c.Y != player.Y)).FirstOrDefault();
+                    // Find an empty space around the player that we can pathfind to. If one exists.
+                    var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).FirstOrDefault(c => {
+                        if (c.IsWalkable && (c.X != player.X || c.Y != player.Y))
+                        {
+                            var map = CreateGoalMap();
+                            map.AddGoal(c.X, c.Y, 100);
+                            return map.FindPaths(this.X, this.Y).Any();
+                        } else
+                        {
+                            return false;
+                        }
+                    });
+
                     if (target != null)
                     {
                         this.goal = new Point(target.X, target.Y);
                         this.goalMap = this.CreateGoalMap();
+                    }
+                    else
+                    {
+                        this.currentState = MonsterState.Wandering;
+                        this.goal = new Point(this.X, this.Y); // reset next round
                     }
                     this.MoveTowardsGoal();
                     break;
