@@ -36,45 +36,55 @@ namespace DeenGames.DeepGeo.Core.Entities
         // We pick a goal, and move towards it, no matter what. Doing this every frame
         // is really expensive and massively slows down the game. We can't have that.
         // Instead, change your goal only when you're stuck -- path is blocked.
-        public void MoveWithAi(Player player)
+         // Returns true if we attacked the player
+        public bool MoveWithAi(Player player)
         {
             switch (this.currentState)
             {
                 case MonsterState.Wandering:
                     this.MoveTowardsGoal();
-                    break;
+                    return false;
                 case MonsterState.Hunting:
-                    // Find an empty space around the player that we can pathfind to. If one exists.
-                    var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).FirstOrDefault(c => {
-                        // Make sure it's walkable, and it's not the player's spot (kills pathfinding)
-                        // Also make sure it's closer to the player than where we are now
-                        if (c.IsWalkable && (c.X != player.X || c.Y != player.Y) && DistanceBetween(player.X, player.Y, c.X, c.Y) <= DistanceBetween(player.X, player.Y, this.X, this.Y))
-                        {
-                            var map = CreateGoalMap();
-                            map.AddGoal(c.X, c.Y, 100);
-                            return map.FindPaths(this.X, this.Y).Any();
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    });
-
-                    if (target != null)
+                    if (DistanceBetween(player.X, player.Y, this.X, this.Y) == 1)
                     {
-                        this.goal = new Point(target.X, target.Y);
-                        this.goalMap = this.CreateGoalMap();
+                        player.Hurt();
+                        return true;
                     }
                     else
                     {
-                        if (this.DistanceBetween(this.X, this.Y, player.X, player.Y) > this.VisionSize)
+                        // Find an empty space around the player that we can pathfind to. If one exists.
+                        var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).FirstOrDefault(c =>
                         {
-                            this.currentState = MonsterState.Wandering;
-                            this.goal = new Point(this.X, this.Y); // reset next round
+                            // Make sure it's walkable, and it's not the player's spot (kills pathfinding)
+                            // Also make sure it's closer to the player than where we are now
+                            if (c.IsWalkable && (c.X != player.X || c.Y != player.Y) && DistanceBetween(player.X, player.Y, c.X, c.Y) <= DistanceBetween(player.X, player.Y, this.X, this.Y))
+                            {
+                                var map = CreateGoalMap();
+                                map.AddGoal(c.X, c.Y, 100);
+                                return map.FindPaths(this.X, this.Y).Any();
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        });
+
+                        if (target != null)
+                        {
+                            this.goal = new Point(target.X, target.Y);
+                            this.goalMap = this.CreateGoalMap();
                         }
+                        else
+                        {
+                            if (this.DistanceBetween(this.X, this.Y, player.X, player.Y) > this.VisionSize)
+                            {
+                                this.currentState = MonsterState.Wandering;
+                                this.goal = new Point(this.X, this.Y); // reset next round
+                            }
+                        }
+                        this.MoveTowardsGoal();
                     }
-                    this.MoveTowardsGoal();
-                    break;
+                    return false;
                 default:
                     throw new InvalidOperationException($"Not sure how to deal with state {this.currentState}");
             }

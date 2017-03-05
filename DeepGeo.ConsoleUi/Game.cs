@@ -45,5 +45,10 @@ namespace DeenGames.DeepGeo.ConsoleUi
             // Start the game.
             SadConsole.Engine.Run();
         }
+
+        public static void Stop()
+        {
+            SadConsole.Engine.MonoGameInstance.Exit();
+        }
     }
 }

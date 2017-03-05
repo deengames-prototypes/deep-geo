@@ -12,9 +12,19 @@
     "Switches": 2,
     "SwitchDoors": 10,
 
-    "NumMonsters":  10,
+    "NumMonsters":  7,
     "Monsters": [
-        { "Speed": 3, "Vision": "Cone", "VisionSize": 3 },
-        { "Speed": 1, "Vision": "Circle", "VisionSize": 3 }        
-    ]
+        {
+            "Speed": 3,
+            "Vision": "Cone",
+            "VisionSize": 3
+        },
+        {
+            "Speed": 1,
+            "Vision": "Circle",
+            "VisionSize": 3
+        }
+    ],
+
+    "StartingHealth":  3
 }

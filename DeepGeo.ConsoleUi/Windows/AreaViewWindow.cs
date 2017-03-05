@@ -22,6 +22,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
     {
         private IList<GameObjectWithData> objects = new List<GameObjectWithData>();
         private CaveFloorMap currentMap;
+        private bool gameOver = false;
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
@@ -130,45 +131,57 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
 
         public override bool ProcessKeyboard(KeyboardInfo info)
         {
-            if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Down)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.S)))
+            if (!this.gameOver)
             {
-                this.MovePlayerBy(new Point(0, 1), info);
-            }
-            else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Up)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.W)))
-            {
-                this.MovePlayerBy(new Point(0, -1), info);
-            }
-
-            if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Right)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.D)))
-            {
-                this.MovePlayerBy(new Point(1, 0), info);
-            }
-            else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Left)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.A)))
-            {
-                this.MovePlayerBy(new Point(-1, 0), info);
-            }
-
-            if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Space)))
-            {
-                var switches = this.objects.Where(o => o.Data is Switch);
-                var player = this.objects.Single(o => o.Data is Player);
-                foreach (var s in switches)
+                if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Down)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.S)))
                 {
-                    if ((Math.Abs(s.Position.X - player.Position.X) + Math.Abs(s.Position.Y - player.Position.Y)) <= 1)
+                    this.MovePlayerBy(new Point(0, 1), info);
+                }
+                else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Up)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.W)))
+                {
+                    this.MovePlayerBy(new Point(0, -1), info);
+                }
+
+                if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Right)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.D)))
+                {
+                    this.MovePlayerBy(new Point(1, 0), info);
+                }
+                else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Left)) || info.KeysPressed.Contains(AsciiKey.Get(Keys.A)))
+                {
+                    this.MovePlayerBy(new Point(-1, 0), info);
+                }
+                else if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Space)))
+                {
+                    this.MovePlayerBy(new Point(0, 0), info);
+                }
+
+                if (info.KeysPressed.Contains(AsciiKey.Get(Keys.Space)))
+                {
+                    var switches = this.objects.Where(o => o.Data is Switch);
+                    var player = this.objects.Single(o => o.Data is Player);
+                    foreach (var s in switches)
                     {
-                        (s.Data as Switch).Flip();
-                        this.currentMap.FlipSwitches();
-
-                        foreach (var w in switches)
+                        if ((Math.Abs(s.Position.X - player.Position.X) + Math.Abs(s.Position.Y - player.Position.Y)) <= 1)
                         {
-                            w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.R, s.Data.Colour.G, s.Data.Colour.B);
-                        }
+                            (s.Data as Switch).Flip();
+                            this.currentMap.FlipSwitches();
 
-                        showMessageCallback("You flip the switch.");
+                            foreach (var w in switches)
+                            {
+                                w.RenderCells[0].ActualForeground = new Color(s.Data.Colour.R, s.Data.Colour.G, s.Data.Colour.B);
+                            }
+
+                            showMessageCallback("You flip the switch.");
+                        }
                     }
                 }
+            } else
+            {
+                if (info.KeysPressed.Any())
+                {
+                    Game.Stop();
+                }
             }
-
             return false;
         }
 
@@ -289,39 +302,54 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
             {
                 var data = monsterView.Data as Monster;
-                data.MoveWithAi(playerView.Data as Player);
-                monsterView.Position = new Point(data.X, data.Y);
-                bool sawPlayer = false;
-
-                var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
-                foreach (var cell in monsterFov)
+                var hurtPlayer = data.MoveWithAi(playerView.Data as Player);
+                if (hurtPlayer)
                 {
-                    if (fovTiles.Any(f => f.X == data.X && f.Y == data.Y))
+                    if ((playerView.Data as Player).IsDead)
                     {
-                        this[cell.X, cell.Y].ApplyEffect(MonsterVisionEffect);
-                        if (playerView.Position.X == cell.X && playerView.Position.Y == cell.Y)
-                        {
-                            data.HuntPlayer();
-                            monsterView.RenderCells.First().ActualForeground = new Color(255, 0, 0);
-                            sawPlayer = true;
-                        }
+                        showMessageCallback("The monster hits you! You die ...");
+                        this.gameOver = true;
                     }
                     else
                     {
-                        if (this.discoveredTiles.ContainsKey($"{data.X}, {data.Y}"))
+                        showMessageCallback("Monster hits you!");
+                    }
+                }
+                else
+                {
+                    monsterView.Position = new Point(data.X, data.Y);
+                    bool sawPlayer = false;
+
+                    var monsterFov = currentFieldOfView.ComputeFov(data.X, data.Y, data.VisionSize, true);
+                    foreach (var cell in monsterFov)
+                    {
+                        if (fovTiles.Any(f => f.X == data.X && f.Y == data.Y))
                         {
-                            this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                            this[cell.X, cell.Y].ApplyEffect(MonsterVisionEffect);
+                            if (playerView.Position.X == cell.X && playerView.Position.Y == cell.Y)
+                            {
+                                data.HuntPlayer();
+                                monsterView.RenderCells.First().ActualForeground = new Color(255, 0, 0);
+                                sawPlayer = true;
+                            }
                         }
                         else
                         {
-                            this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                            if (this.discoveredTiles.ContainsKey($"{data.X}, {data.Y}"))
+                            {
+                                this[cell.X, cell.Y].ApplyEffect(DiscoveredEffect);
+                            }
+                            else
+                            {
+                                this[cell.X, cell.Y].ApplyEffect(HiddenEffect);
+                            }
                         }
                     }
-                }
 
-                if (!sawPlayer && monsterView.RenderCells.First().ActualForeground.R == 255)
-                {
-                    monsterView.RenderCells.First().ActualForeground = new Color(data.Colour.R, data.Colour.G, data.Colour.B);
+                    if (!sawPlayer && monsterView.RenderCells.First().ActualForeground.R == 255)
+                    {
+                        monsterView.RenderCells.First().ActualForeground = new Color(data.Colour.R, data.Colour.G, data.Colour.B);
+                    }
                 }
             }
 
