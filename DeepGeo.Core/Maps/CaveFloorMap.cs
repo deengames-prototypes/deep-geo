@@ -285,6 +285,12 @@ namespace DeenGames.DeepGeo.Core.Maps
                 var visionSize = (int)t["VisionSize"];
                 var spot = this.FindEmptyPosition();
 
+                // Don't be too close to the player
+                while (Math.Abs(spot.X - this.playerStartPosition.X) + Math.Abs(spot.Y - this.playerStartPosition.Y) <= 2 * visionSize)
+                {
+                    spot = this.FindEmptyPosition();
+                }
+
                 var m = new Monster(colour, speed, vision, visionSize, this);
                 m.Move(spot);
                 this.entities.Add(m);

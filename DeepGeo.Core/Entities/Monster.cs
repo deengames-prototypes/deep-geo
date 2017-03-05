@@ -98,7 +98,8 @@ namespace DeenGames.DeepGeo.Core.Entities
                 }
             } else
             {
-                // No path to goal...
+                // No path to goal... Pick a new goal next time
+                this.goal = new Point(this.X, this.Y);
             }
         }
 
