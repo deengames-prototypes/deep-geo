@@ -34,9 +34,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Screens
             this.Add(mainView);
             this.Add(messageAndStatusConsole);
 
-            //messageAndStatusConsole.ShowMessage("First message");
-            //messageAndStatusConsole.ShowMessage("SECOND message");
-            //messageAndStatusConsole.ShowMessage("3rd message");
+            messageAndStatusConsole.ShowMessage("Welcome to Deep Geo!");
         }
     }
 }

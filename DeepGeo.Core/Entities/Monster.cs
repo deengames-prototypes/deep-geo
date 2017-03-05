@@ -46,12 +46,15 @@ namespace DeenGames.DeepGeo.Core.Entities
                 case MonsterState.Hunting:
                     // Find an empty space around the player that we can pathfind to. If one exists.
                     var target = map.GetIMap().GetCellsInRadius(player.X, player.Y, 1).FirstOrDefault(c => {
-                        if (c.IsWalkable && (c.X != player.X || c.Y != player.Y))
+                        // Make sure it's walkable, and it's not the player's spot (kills pathfinding)
+                        // Also make sure it's closer to the player than where we are now
+                        if (c.IsWalkable && (c.X != player.X || c.Y != player.Y) && DistanceBetween(player.X, player.Y, c.X, c.Y) <= DistanceBetween(player.X, player.Y, this.X, this.Y))
                         {
                             var map = CreateGoalMap();
                             map.AddGoal(c.X, c.Y, 100);
                             return map.FindPaths(this.X, this.Y).Any();
-                        } else
+                        }
+                        else
                         {
                             return false;
                         }
@@ -64,14 +67,29 @@ namespace DeenGames.DeepGeo.Core.Entities
                     }
                     else
                     {
-                        this.currentState = MonsterState.Wandering;
-                        this.goal = new Point(this.X, this.Y); // reset next round
+                        if (this.DistanceBetween(this.X, this.Y, player.X, player.Y) > this.VisionSize)
+                        {
+                            this.currentState = MonsterState.Wandering;
+                            this.goal = new Point(this.X, this.Y); // reset next round
+                        }
                     }
                     this.MoveTowardsGoal();
                     break;
                 default:
                     throw new InvalidOperationException($"Not sure how to deal with state {this.currentState}");
             }
+        }
+
+        public void HuntPlayer()
+        {
+            this.currentState = MonsterState.Hunting;
+        }
+
+        // Distance between (x1, y1) and (x2, y2)
+        private int DistanceBetween(int x1, int y1, int x2, int y2)
+        {
+            // Approximate? Manhatten? distance.
+            return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
         }
 
         private void MoveTowardsGoal()
@@ -120,10 +138,7 @@ namespace DeenGames.DeepGeo.Core.Entities
             return goalMap;
         }
 
-        public void HuntPlayer()
-        {
-            this.currentState = MonsterState.Hunting;
-        }
+        
     }
 
     public enum MonsterState
