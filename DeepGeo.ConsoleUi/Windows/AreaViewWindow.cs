@@ -15,6 +15,7 @@ using System.Linq;
 using DeenGames.DeepGeo.Core.Entities;
 using DeenGames.DeepGeo.Core.IO;
 using DeenGames.DeepGeo.ConsoleUi.SadConsoleHelpers;
+using DeenGames.DeepGeo.Core;
 
 namespace DeenGames.DeepGeo.ConsoleUi.Windows
 {
@@ -23,6 +24,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
         private IList<GameObjectWithData> objects = new List<GameObjectWithData>();
         private CaveFloorMap currentMap;
         private bool gameOver = false;
+        private TurnCalculator turnCalculator;
 
         private ICellEffect DiscoveredEffect = new Recolor() { Foreground = Color.LightGray * 0.5f, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
         private ICellEffect HiddenEffect = new Recolor() { Foreground = Color.Black, Background = Color.Black, DoForeground = true, DoBackground = true, CloneOnApply = false };
@@ -54,6 +56,9 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             var currentFieldOfView = new RogueSharp.FieldOfView(this.currentMap.GetIMap());
             var fovTiles = currentFieldOfView.ComputeFov(playerEntity.Position.X, playerEntity.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
+
+            var creatures = this.objects.Where(s => s.Data is Monster || s.Data is Player).Select(e => e.Data as IHasAgility);
+            this.turnCalculator = new TurnCalculator(creatures);
         }
 
         public override void Render()
@@ -108,7 +113,7 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
                 // for a certain feature
                 if (capabilities.HasLeftXThumbStick)
                 {
-                    // Check teh direction in X axis of left analog stick
+                    // Check the direction in X axis of left analog stick
                     if (state.ThumbSticks.Left.X < -0.5f)
                     {
                         this.MovePlayerBy(new Point(-1, 0));
@@ -298,9 +303,23 @@ namespace DeenGames.DeepGeo.ConsoleUi.Windows
             fovTiles = currentFieldOfView.ComputeFov(playerView.Position.X, playerView.Position.Y, Config.Instance.Get<int>("PlayerLightRadius"), true);
             this.MarkCurrentFovAsVisible(fovTiles);
 
-            // Monsters turn. Also, draw their field-of-view.
-            foreach (var monsterView in this.objects.Where(o => o.Data is Monster))
+            // Monsters turn. Also, draw their field-of-view. Keep queuing turns until it's the player's turn again.
+            var monstersToMove = new List<IHasAgility>();
+            IHasAgility next = null;
+            while (next != playerView.Data)
             {
+                if (next != null)
+                {
+                    monstersToMove.Add(next);
+                }
+                next = turnCalculator.NextTurn();
+            }
+            
+            while (monstersToMove.Any())
+            {
+                var m = monstersToMove[0];
+                monstersToMove.RemoveAt(0); 
+                var monsterView = this.objects.Single(o => o.Data is Monster && o.Data == m);
                 var data = monsterView.Data as Monster;
                 var hurtPlayer = data.MoveWithAi(playerView.Data as Player);
                 if (hurtPlayer)
