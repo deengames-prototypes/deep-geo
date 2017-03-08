@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Affordances.cs" />
+    <Compile Include="Entities\IHasAgility.cs" />
     <Compile Include="Entities\Monster.cs" />
     <Compile Include="Entities\Switch.cs" />
     <Compile Include="Entities\SwitchDoor.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="Maps\CaveFloorMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TurnCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

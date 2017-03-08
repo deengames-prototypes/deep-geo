@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace DeenGames.DeepGeo.Core.Entities
 {
-    public class Monster : Entity
+    public class Monster : Entity, IHasAgility
     {
-        public int Speed { get; private set; }
         public string VisionType { get; private set; }
         public int VisionSize { get; private set; }
+        public int Agility { get; private set; }
 
         private MonsterState currentState = MonsterState.Wandering;
 
@@ -22,9 +22,9 @@ namespace DeenGames.DeepGeo.Core.Entities
         private Point goal;
         private IGoalMap goalMap;
 
-        public Monster(ColourTuple colour, int speed, string visionType, int visionSize, CaveFloorMap map) : base('m', colour, true)
+        public Monster(ColourTuple colour, int agility, string visionType, int visionSize, CaveFloorMap map) : base('m', colour, true)
         {
-            this.Speed = speed;
+            this.Agility = agility;
             this.VisionType = visionType;
             this.VisionSize = visionSize;
 

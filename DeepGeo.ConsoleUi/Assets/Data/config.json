@@ -26,5 +26,6 @@
         }
     ],
 
-    "StartingHealth":  3
+    "StartingHealth": 3,
+    "PlayerAgility":  7
 }
